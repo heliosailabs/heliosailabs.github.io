@@ -187,5 +187,91 @@
         if (!el) return;
         start = Number(start) || 0;
         end = Number(end) || 0;
-        const range = end - start
+        const range = end - start;
+        const startTime = performance.now();
+        function step(now) {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const value = Math.round(start + range * progress);
+            // Para ROI que suele ser un porcentaje pequeño: queremos que el sufijo % quede después
+            // Para moneda usamos toLocaleString
+            el.textContent = prefix + value.toLocaleString('es-MX') + suffix;
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    // Función principal
+    function calcularROI() {
+        console.log('Función calcularROI iniciada');
+
+        // Obtener valores con validaciones sencillas
+        const industria = document.getElementById('industria')?.value || '';
+        const citasMensuales = parseInt(document.getElementById('citasMensuales')?.value || '0', 10) || 0;
+        const noShows = parseInt(document.getElementById('noShows')?.value || '0', 10) || 0;
+        const precioPromedio = parseInt(document.getElementById('precioPromedio')?.value || '0', 10) || 0;
+        const horasAdmin = parseInt(document.getElementById('horasAdmin')?.value || '0', 10) || 0;
+
+        console.log({ industria, citasMensuales, noShows, precioPromedio, horasAdmin });
+
+        // Cálculos
+        const citasPerdidas = Math.round(citasMensuales * (noShows / 100));
+        const perdidaMensual = citasPerdidas * precioPromedio;
+
+        // Con automatización (reducción 70% no-shows => new % = noShows * 0.3)
+        const nuevosNoShows = Math.round(noShows * 0.3);
+        const nuevasCitasPerdidas = Math.round(citasMensuales * (nuevosNoShows / 100));
+        const citasRecuperadas = citasPerdidas - nuevasCitasPerdidas;
+        const aumentoCapacidad = Math.round(citasMensuales * 0.5);
+        const ingresosExtra = (citasRecuperadas + aumentoCapacidad) * precioPromedio;
+
+        const tiempoAhorrado = Math.round(horasAdmin * 0.75);
+
+        const costoSistema = 6500;
+        const gananciaNetaMensual = ingresosExtra - costoSistema;
+        const roi = Math.round((gananciaNetaMensual * 3 / costoSistema) * 100);
+
+        // Mostrar sección de resultados
+        const placeholderEl = document.getElementById('placeholder');
+        const resultadosEl = document.getElementById('resultados');
+        if (placeholderEl) placeholderEl.classList.add('hidden');
+        if (resultadosEl) resultadosEl.classList.remove('hidden');
+
+        // Elementos donde mostrar valores
+        const perdidaMensualEl = document.getElementById('perdidaMensual');
+        const ingresosExtraEl = document.getElementById('ingresosExtra');
+        const tiempoAhorradoEl = document.getElementById('tiempoAhorrado');
+        const roiEl = document.getElementById('roi');
+
+        // Animar/mostrar valores (si prefieres sin animación asigna .textContent directamente)
+        animateValue(perdidaMensualEl, 0, perdidaMensual, 900, '$', '');
+        animateValue(ingresosExtraEl, 0, ingresosExtra, 900, '+$', '');
+        animateValue(tiempoAhorradoEl, 0, tiempoAhorrado, 700, '', 'h');
+        // ROI: animamos el número y añadimos % como sufijo
+        animateValue(roiEl, 0, roi, 700, '', '%');
+
+        // Resumen HTML
+        const resumenTextoEl = document.getElementById('resumenTexto');
+        const resumen = `
+            <p><strong>📊 Tu situación actual:</strong></p>
+            <p>Con ${citasMensuales} citas mensuales y ${noShows}% de no-shows, estás perdiendo ${citasPerdidas} citas al mes, equivalentes a <strong>$${perdidaMensual.toLocaleString('es-MX')} MXN</strong>.</p>
+            
+            <p class="mt-3"><strong>🚀 Con nuestro sistema de automatización:</strong></p>
+            <ul class="list-disc list-inside space-y-1">
+                <li>Reducirías no-shows a solo ${nuevosNoShows}%</li>
+                <li>Recuperarías ${citasRecuperadas} citas perdidas</li>
+                <li>Aumentarías capacidad en ${aumentoCapacidad} citas más</li>
+                <li>Ahorrarías ${tiempoAhorrado} horas semanales</li>
+            </ul>
+            
+            <p class="mt-3"><strong>💰 Resultado final:</strong></p>
+            <p>Ingresos extra de <strong>$${ingresosExtra.toLocaleString('es-MX')} MXN/mes</strong> con un ROI del <strong>${roi}%</strong> en solo 3 meses.</p>
+        `;
+        if (resumenTextoEl) resumenTextoEl.innerHTML = resumen;
+
+        console.log('Cálculo completado', { perdidaMensual, ingresosExtra, tiempoAhorrado, roi });
+    }
+    </script>
+
+</body>
+</html>
 
