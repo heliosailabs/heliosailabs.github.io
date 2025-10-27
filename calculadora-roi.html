@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora ROI - HELIOS AI LABS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-text {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 to-slate-800 min-h-screen">
+    
+    <!-- Header -->
+    <div class="bg-slate-800/50 border-b border-slate-700 py-4">
+        <div class="max-w-6xl mx-auto px-4 flex items-center justify-between">
+            <a href="index.html" class="flex items-center space-x-3">
+                <img src="HeliosLogoBlackSun.png" alt="HELIOS AI LABS" class="h-12">
+            </a>
+            <a href="index.html#contacto" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-6 py-2 rounded-lg font-semibold hover:from-amber-600 hover:to-yellow-600 transition">
+                Agendar Demo
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-4 py-12">
+        
+        <!-- Title -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-white mb-4">
+                Calculadora de <span class="gradient-text">ROI</span>
+            </h1>
+            <p class="text-xl text-gray-300">
+                Descubre cuánto dinero estás perdiendo sin automatización
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            
+            <!-- Input Form -->
+            <div class="bg-white rounded-2xl p-8 shadow-2xl">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-calculator text-amber-500 mr-2"></i>
+                    Datos de tu Negocio
+                </h2>
+                
+                <form id="roiForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Industria
+                        </label>
+                        <select id="industria" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500">
+                            <option value="salud">Salud (Clínicas, Dentistas, Médicos)</option>
+                            <option value="legal">Legal (Despachos, Abogados)</option>
+                            <option value="inmobiliaria">Inmobiliaria</option>
+                            <option value="restaurante">Restaurante/Cafetería</option>
+                            <option value="otra">Otra</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Citas/Consultas mensuales actuales
+                        </label>
+                        <input type="number" id="citasMensuales" value="50" min="1" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Porcentaje de no-shows (cancelaciones sin aviso)
+                        </label>
+                        <div class="flex items-center space-x-4">
+                            <input type="range" id="noShows" value="30" min="0" max="100" class="flex-1">
+                            <span id="noShowsValue" class="text-2xl font-bold text-amber-600 w-16">30%</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Precio promedio por cita/servicio (MXN)
+                        </label>
+                        <input type="number" id="precioPromedio" value="1000" min="100" step="100" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Horas semanales en tareas administrativas
+                        </label>
+                        <input type="number" id="horasAdmin" value="20" min="1" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500">
+                    </div>
+
+                    <button type="button" onclick="calcularROI()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white py-4 rounded-lg font-bold text-lg hover:from-amber-600 hover:to-yellow-600 transition shadow-xl">
+                        🚀 Calcular Mi ROI
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results -->
+            <div id="resultados" class="hidden">
+                <div class="bg-gradient-to-br from-red-500 to-red-600 text-white rounded-2xl p-8 shadow-2xl mb-6">
+                    <h3 class="text-2xl font-bold mb-4">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Estás Perdiendo
+                    </h3>
+                    <div class="text-6xl font-bold mb-2" id="perdidaMensual">$0</div>
+                    <p class="text-xl opacity-90">MXN por mes en ingresos perdidos</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-2xl p-8 shadow-2xl mb-6">
+                    <h3 class="text-2xl font-bold mb-4">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        Con Automatización
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <div class="text-3xl font-bold" id="ingresosExtra">+$0</div>
+                            <p class="text-sm opacity-90">Ingresos extra/mes</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold" id="tiempoAhorrado">0h</div>
+                            <p class="text-sm opacity-90">Tiempo ahorrado/semana</p>
+                        </div>
+                    </div>
+                    <div class="border-t border-white/30 pt-4">
+                        <div class="text-4xl font-bold mb-1" id="roi">0%</div>
+                        <p class="text-lg opacity-90">ROI en 3 meses</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 shadow-2xl">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">
+                        <i class="fas fa-lightbulb text-amber-500 mr-2"></i>
+                        Resumen Personalizado
+                    </h3>
+                    <div id="resumenTexto" class="text-gray-700 space-y-3"></div>
+                    
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <a href="index.html#contacto" class="block w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white py-4 rounded-lg font-bold text-center hover:from-amber-600 hover:to-yellow-600 transition">
+                            Agendar Mi Demo Gratuita
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder cuando no hay resultados -->
+            <div id="placeholder" class="flex items-center justify-center">
+                <div class="text-center text-gray-400">
+                    <i class="fas fa-arrow-left text-6xl mb-4"></i>
+                    <p class="text-xl">Completa los datos a la izquierda para ver tu ROI</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update slider value display
+        document.getElementById('noShows').addEventListener('input', function() {
+            document.getElementById('noShowsValue').textContent = this.value + '%';
+        });
+
+        function calcularROI() {
+            // Get values
+            const industria = document.getElementById('industria').value;
+            const citasMensuales = parseInt(document.getElementById('citasMensuales').value);
+            const noShows = parseInt(document.getElementById('noShows').value);
+            const precioPromedio = parseInt(document.getElementById('precioPromedio').value);
+            const horasAdmin = parseInt(document.getElementById('horasAdmin').value);
+
+            // Calculations
+            const citasPerdidas = Math.round(citasMensuales * (noShows / 100));
+            const perdidaMensual = citasPerdidas * precioPromedio;
+            
+            // Con automatización (reducción 70% no-shows + aumento 50% capacidad)
+            const nuevosNoShows = Math.round(noShows * 0.3); // Reducción 70%
+            const nuevasCitasPerdidas = Math.round(citasMensuales * (nuevosNoShows / 100));
+            const citasRecuperadas = citasPerdidas - nuevasCitasPerdidas;
+            const aumentoCapacidad = Math.round(citasMensuales * 0.5);
+            const ingresosExtra = (citasRecuperadas + aumentoCapacidad) * precioPromedio;
+            
+            const tiempoAhorrado = Math.round(horasAdmin
