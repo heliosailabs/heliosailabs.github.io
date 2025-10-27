@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Calculadora ROI - HELIOS AI LABS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -52,7 +52,7 @@
                     Datos de tu Negocio
                 </h2>
                 
-                <form id="roiForm" class="space-y-6">
+                <form id="roiForm" class="space-y-6" onsubmit="return false;">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Industria
@@ -97,7 +97,7 @@
                         <input type="number" id="horasAdmin" value="20" min="1" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500">
                     </div>
 
-                    <button type="button" onclick="calcularROI()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white py-4 rounded-lg font-bold text-lg hover:from-amber-600 hover:to-yellow-600 transition shadow-xl">
+                    <button type="button" id="btnCalcular" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white py-4 rounded-lg font-bold text-lg hover:from-amber-600 hover:to-yellow-600 transition shadow-xl">
                         🚀 Calcular Mi ROI
                     </button>
                 </form>
@@ -160,70 +160,32 @@
         </div>
     </div>
 
+    <!-- SCRIPT: Pegar justo antes de </body> -->
     <script>
-        // Update slider value display
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('noShows').addEventListener('input', function() {
-        document.getElementById('noShowsValue').textContent = this.value + '%';
+    // Esperar a que DOM esté listo y enganchar listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        const noShowsSlider = document.getElementById('noShows');
+        const noShowsValue = document.getElementById('noShowsValue');
+        const btnCalcular = document.getElementById('btnCalcular');
+
+        // Inicializar valor del slider
+        if (noShowsSlider && noShowsValue) {
+            noShowsValue.textContent = noShowsSlider.value + '%';
+            noShowsSlider.addEventListener('input', function() {
+                noShowsValue.textContent = this.value + '%';
+            });
+        }
+
+        // Enlazar botón
+        if (btnCalcular) {
+            btnCalcular.addEventListener('click', calcularROI);
+        }
     });
-});
 
-        function calcularROI() {
-    console.log('Función calcularROI iniciada');
-    
-    // Get values
-    const industria = document.getElementById('industria').value;
-    const citasMensuales = parseInt(document.getElementById('citasMensuales').value);
-    const noShows = parseInt(document.getElementById('noShows').value);
-    const precioPromedio = parseInt(document.getElementById('precioPromedio').value);
-    const horasAdmin = parseInt(document.getElementById('horasAdmin').value);
+    // Animador de números (usado para mejores UX)
+    function animateValue(el, start, end, duration = 800, prefix = '', suffix = '') {
+        if (!el) return;
+        start = Number(start) || 0;
+        end = Number(end) || 0;
+        const range = end - start
 
-    console.log('Valores:', {citasMensuales, noShows, precioPromedio, horasAdmin});
-
-    // Calculations
-    const citasPerdidas = Math.round(citasMensuales * (noShows / 100));
-    const perdidaMensual = citasPerdidas * precioPromedio;
-    
-    // Con automatización (reducción 70% no-shows + aumento 50% capacidad)
-    const nuevosNoShows = Math.round(noShows * 0.3);
-    const nuevasCitasPerdidas = Math.round(citasMensuales * (nuevosNoShows / 100));
-    const citasRecuperadas = citasPerdidas - nuevasCitasPerdidas;
-    const aumentoCapacidad = Math.round(citasMensuales * 0.5);
-    const ingresosExtra = (citasRecuperadas + aumentoCapacidad) * precioPromedio;
-    
-    const tiempoAhorrado = Math.round(horasAdmin * 0.75);
-    
-    const costoSistema = 6500;
-    const gananciaNetaMensual = ingresosExtra - costoSistema;
-    const roi = Math.round((gananciaNetaMensual * 3 / costoSistema) * 100);
-
-    // Display results
-    document.getElementById('placeholder').classList.add('hidden');
-    document.getElementById('resultados').classList.remove('hidden');
-    
-    document.getElementById('perdidaMensual').textContent = '$' + perdidaMensual.toLocaleString('es-MX');
-    document.getElementById('ingresosExtra').textContent = '+$' + ingresosExtra.toLocaleString('es-MX');
-    document.getElementById('tiempoAhorrado').textContent = tiempoAhorrado + 'h';
-    document.getElementById('roi').textContent = roi + '%';
-
-    // Personalized summary
-    const resumen = `
-        <p><strong>📊 Tu situación actual:</strong></p>
-        <p>Con ${citasMensuales} citas mensuales y ${noShows}% de no-shows, estás perdiendo ${citasPerdidas} citas al mes, equivalentes a <strong>$${perdidaMensual.toLocaleString('es-MX')} MXN</strong>.</p>
-        
-        <p class="mt-3"><strong>🚀 Con nuestro sistema de automatización:</strong></p>
-        <ul class="list-disc list-inside space-y-1">
-            <li>Reducirías no-shows a solo ${nuevosNoShows}%</li>
-            <li>Recuperarías ${citasRecuperadas} citas perdidas</li>
-            <li>Aumentarías capacidad en ${aumentoCapacidad} citas más</li>
-            <li>Ahorrarías ${tiempoAhorrado} horas semanales</li>
-        </ul>
-        
-        <p class="mt-3"><strong>💰 Resultado final:</strong></p>
-        <p>Ingresos extra de <strong>$${ingresosExtra.toLocaleString('es-MX')} MXN/mes</strong> con un ROI del <strong>${roi}%</strong> en solo 3 meses.</p>
-    `;
-    
-    document.getElementById('resumenTexto').innerHTML = resumen;
-    
-    console.log('Cálculo completado');
-}
