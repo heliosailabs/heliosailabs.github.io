@@ -162,27 +162,68 @@
 
     <script>
         // Update slider value display
-        document.getElementById('noShows').addEventListener('input', function() {
-            document.getElementById('noShowsValue').textContent = this.value + '%';
-        });
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('noShows').addEventListener('input', function() {
+        document.getElementById('noShowsValue').textContent = this.value + '%';
+    });
+});
 
         function calcularROI() {
-            // Get values
-            const industria = document.getElementById('industria').value;
-            const citasMensuales = parseInt(document.getElementById('citasMensuales').value);
-            const noShows = parseInt(document.getElementById('noShows').value);
-            const precioPromedio = parseInt(document.getElementById('precioPromedio').value);
-            const horasAdmin = parseInt(document.getElementById('horasAdmin').value);
+    console.log('Función calcularROI iniciada');
+    
+    // Get values
+    const industria = document.getElementById('industria').value;
+    const citasMensuales = parseInt(document.getElementById('citasMensuales').value);
+    const noShows = parseInt(document.getElementById('noShows').value);
+    const precioPromedio = parseInt(document.getElementById('precioPromedio').value);
+    const horasAdmin = parseInt(document.getElementById('horasAdmin').value);
 
-            // Calculations
-            const citasPerdidas = Math.round(citasMensuales * (noShows / 100));
-            const perdidaMensual = citasPerdidas * precioPromedio;
-            
-            // Con automatización (reducción 70% no-shows + aumento 50% capacidad)
-            const nuevosNoShows = Math.round(noShows * 0.3); // Reducción 70%
-            const nuevasCitasPerdidas = Math.round(citasMensuales * (nuevosNoShows / 100));
-            const citasRecuperadas = citasPerdidas - nuevasCitasPerdidas;
-            const aumentoCapacidad = Math.round(citasMensuales * 0.5);
-            const ingresosExtra = (citasRecuperadas + aumentoCapacidad) * precioPromedio;
-            
-            const tiempoAhorrado = Math.round(horasAdmin
+    console.log('Valores:', {citasMensuales, noShows, precioPromedio, horasAdmin});
+
+    // Calculations
+    const citasPerdidas = Math.round(citasMensuales * (noShows / 100));
+    const perdidaMensual = citasPerdidas * precioPromedio;
+    
+    // Con automatización (reducción 70% no-shows + aumento 50% capacidad)
+    const nuevosNoShows = Math.round(noShows * 0.3);
+    const nuevasCitasPerdidas = Math.round(citasMensuales * (nuevosNoShows / 100));
+    const citasRecuperadas = citasPerdidas - nuevasCitasPerdidas;
+    const aumentoCapacidad = Math.round(citasMensuales * 0.5);
+    const ingresosExtra = (citasRecuperadas + aumentoCapacidad) * precioPromedio;
+    
+    const tiempoAhorrado = Math.round(horasAdmin * 0.75);
+    
+    const costoSistema = 6500;
+    const gananciaNetaMensual = ingresosExtra - costoSistema;
+    const roi = Math.round((gananciaNetaMensual * 3 / costoSistema) * 100);
+
+    // Display results
+    document.getElementById('placeholder').classList.add('hidden');
+    document.getElementById('resultados').classList.remove('hidden');
+    
+    document.getElementById('perdidaMensual').textContent = '$' + perdidaMensual.toLocaleString('es-MX');
+    document.getElementById('ingresosExtra').textContent = '+$' + ingresosExtra.toLocaleString('es-MX');
+    document.getElementById('tiempoAhorrado').textContent = tiempoAhorrado + 'h';
+    document.getElementById('roi').textContent = roi + '%';
+
+    // Personalized summary
+    const resumen = `
+        <p><strong>📊 Tu situación actual:</strong></p>
+        <p>Con ${citasMensuales} citas mensuales y ${noShows}% de no-shows, estás perdiendo ${citasPerdidas} citas al mes, equivalentes a <strong>$${perdidaMensual.toLocaleString('es-MX')} MXN</strong>.</p>
+        
+        <p class="mt-3"><strong>🚀 Con nuestro sistema de automatización:</strong></p>
+        <ul class="list-disc list-inside space-y-1">
+            <li>Reducirías no-shows a solo ${nuevosNoShows}%</li>
+            <li>Recuperarías ${citasRecuperadas} citas perdidas</li>
+            <li>Aumentarías capacidad en ${aumentoCapacidad} citas más</li>
+            <li>Ahorrarías ${tiempoAhorrado} horas semanales</li>
+        </ul>
+        
+        <p class="mt-3"><strong>💰 Resultado final:</strong></p>
+        <p>Ingresos extra de <strong>$${ingresosExtra.toLocaleString('es-MX')} MXN/mes</strong> con un ROI del <strong>${roi}%</strong> en solo 3 meses.</p>
+    `;
+    
+    document.getElementById('resumenTexto').innerHTML = resumen;
+    
+    console.log('Cálculo completado');
+}
