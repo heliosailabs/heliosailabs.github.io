@@ -9,12 +9,11 @@
       margin: 0;
       height: 100%;
       overflow: hidden;
-      background-color: #000;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: white;
+      background-color: #000010;
     }
 
-    /* Fondo animado */
     #fondo {
       position: fixed;
       width: 100%;
@@ -24,7 +23,6 @@
       z-index: 0;
     }
 
-    /* Contenedor del contenido */
     #contenido {
       position: relative;
       z-index: 10;
@@ -37,32 +35,31 @@
       padding: 0 20px;
     }
 
-    #contenido img {
-      max-width: 300px;
-      width: 60%;
-      height: auto;
-      margin-bottom: 30px;
-      filter: brightness(1.2);
-    }
-
     h1 {
-      font-size: 2.8rem;
+      font-size: 3rem;
       letter-spacing: 2px;
       margin-bottom: 10px;
-      color: white;
-      text-shadow: 0 0 20px rgba(255,255,255,0.4);
+      background: linear-gradient(90deg, #00ffff, #0077ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #00ffff; }
+      to { text-shadow: 0 0 25px #00ffff; }
     }
 
     p {
       font-size: 1.2rem;
       max-width: 600px;
-      color: #ccc;
+      color: #b0c7ff;
     }
 
     .btn {
       margin-top: 30px;
       padding: 12px 28px;
-      background: white;
+      background: linear-gradient(90deg, #00ffff, #0077ff);
       border: none;
       border-radius: 30px;
       color: black;
@@ -74,7 +71,7 @@
 
     .btn:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 20px white;
+      box-shadow: 0 0 20px #00ffff;
     }
   </style>
 </head>
@@ -84,9 +81,8 @@
 
   <!-- Contenido principal -->
   <div id="contenido">
-    <img src="assets/HeliosLogoBlackSunPortadaFacebook1.jpg" alt="Helios AI Labs Logo">
     <h1>Helios AI Labs</h1>
-    <p>Innovación, inteligencia y tecnología en un solo espacio.<br>
+    <p>Innovación, inteligencia y tecnología en un solo espacio. 
        Explora el futuro de la automatización y la inteligencia artificial.</p>
     <button class="btn" onclick="location.href='https://heliosailabs.github.io'">
       Volver al sitio principal
@@ -106,11 +102,11 @@
       minWidth: 200.00,
       scale: 1.00,
       scaleMobile: 1.00,
-      color: 0xffffff,           // Líneas blancas
-      backgroundColor: 0x000000, // Fondo negro absoluto
-      points: 10.00,
-      maxDistance: 20.00,
-      spacing: 17.00
+      color: 0x00ffff,
+      backgroundColor: 0x000011,
+      points: 12.00,
+      maxDistance: 22.00,
+      spacing: 18.00
     })
   </script>
 </body>
