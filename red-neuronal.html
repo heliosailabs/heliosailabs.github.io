@@ -8,10 +8,10 @@
     html, body {
       margin: 0;
       height: 100%;
-      overflow: hidden;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: white;
       background-color: #000010;
+      overflow-x: hidden;
     }
 
     #fondo {
@@ -30,9 +30,10 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100%;
+      min-height: 100vh;
       text-align: center;
-      padding: 0 20px;
+      padding: 40px 20px;
+      box-sizing: border-box;
     }
 
     h1 {
@@ -49,19 +50,21 @@
       from { text-shadow: 0 0 10px #00ffff; }
       to { text-shadow: 0 0 25px #00ffff; }
     }
-@keyframes float {
+
+    @keyframes float {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
+      50% { transform: translateY(-15px); }
     }
+
     p {
       font-size: 1.2rem;
       max-width: 600px;
       color: #b0c7ff;
+      margin: 15px 0 25px;
     }
 
     .btn {
-      margin-top: 30px;
-      padding: 12px 28px;
+      padding: 14px 30px;
       background: linear-gradient(90deg, #00ffff, #0077ff);
       border: none;
       border-radius: 30px;
@@ -76,6 +79,24 @@
       transform: scale(1.05);
       box-shadow: 0 0 20px #00ffff;
     }
+
+    .logo {
+      width: 200px;
+      height: auto;
+      margin-bottom: 30px;
+      border-radius: 20px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.6));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    /* Ajustes para pantallas pequeñas */
+    @media (max-width: 600px) {
+      h1 { font-size: 2.2rem; }
+      p { font-size: 1rem; }
+      .logo { width: 150px; }
+      .btn { padding: 12px 24px; font-size: 0.9rem; }
+    }
   </style>
 </head>
 <body>
@@ -84,15 +105,13 @@
 
   <!-- Contenido principal -->
   <div id="contenido">
-   <div id="contenido">
-    <img src="HeliosLogoBlackSun.png" alt="HELIOS AI LABS" style="width: 200px; height: auto; margin-bottom: 30px; filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5)); animation: float 3s ease-in-out infinite;">
+    <img src="HeliosLogoBlackSun.png" alt="HELIOS AI LABS" class="logo">
     <h1>Helios AI Labs</h1>
-    <p>Innovación, inteligencia y tecnología en un solo espacio. 
+    <p>Innovación, inteligencia y tecnología en un solo espacio.<br>
        Explora el futuro de la automatización y la inteligencia artificial.</p>
     <button class="btn" onclick="location.href='https://heliosailabs.github.io'">
       Entrar al Sitio Principal
     </button>
-  </div> 
   </div>
 
   <!-- Scripts de Vanta -->
@@ -117,3 +136,4 @@
   </script>
 </body>
 </html>
+
