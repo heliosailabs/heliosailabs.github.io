@@ -49,7 +49,10 @@
       from { text-shadow: 0 0 10px #00ffff; }
       to { text-shadow: 0 0 25px #00ffff; }
     }
-
+@keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
     p {
       font-size: 1.2rem;
       max-width: 600px;
@@ -81,12 +84,15 @@
 
   <!-- Contenido principal -->
   <div id="contenido">
+   <div id="contenido">
+    <img src="HeliosLogoBlackSun.png" alt="HELIOS AI LABS" style="width: 200px; height: auto; margin-bottom: 30px; filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5)); animation: float 3s ease-in-out infinite;">
     <h1>Helios AI Labs</h1>
     <p>Innovación, inteligencia y tecnología en un solo espacio. 
        Explora el futuro de la automatización y la inteligencia artificial.</p>
     <button class="btn" onclick="location.href='https://heliosailabs.github.io'">
-      Volver al sitio principal
+      Entrar al Sitio Principal
     </button>
+  </div> 
   </div>
 
   <!-- Scripts de Vanta -->
