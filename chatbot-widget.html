@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Chatbot IA - HELIOS AI LABS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .chat-bubble {
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .typing-indicator span {
+            animation: blink 1.4s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 to-slate-800 min-h-screen flex items-center justify-center p-4">
+    
+    <div class="max-w-4xl w-full">
+        <!-- Header -->
+        <div class="bg-slate-800 rounded-t-2xl p-6 border-b border-slate-700">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="HeliosLogoBlackSun.png" alt="HELIOS" class="h-12">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Demo: Chatbot con IA</h1>
+                        <p class="text-gray-400 text-sm">Prueba nuestro agente automatizado en acción</p>
+                    </div>
+                </div>
+                <a href="index.html" class="text-amber-400 hover:text-amber-300">
+                    <i class="fas fa-home text-2xl"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="bg-white rounded-b-2xl shadow-2xl overflow-hidden">
+            
+            <!-- Chat Messages -->
+            <div id="chatMessages" class="h-96 overflow-y-auto p-6 space-y-4 bg-gray-50">
+                <!-- Mensaje inicial del bot -->
+                <div class="flex items-start space-x-3 chat-bubble">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <div class="bg-white rounded-2xl rounded-tl-none p-4 shadow-md max-w-md">
+                        <p class="text-gray-800">¡Hola! Soy el asistente virtual de HELIOS AI LABS. Puedo responder tus preguntas sobre automatización con IA para tu negocio. ¿En qué te puedo ayudar?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t border-gray-200 p-4 bg-white">
+                <form id="chatForm" class="flex space-x-3">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Escribe tu pregunta aquí..." 
+                        class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                        required
+                    >
+                    <button 
+                        type="submit" 
+                        id="sendBtn"
+                        class="bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-amber-600 hover:to-yellow-600 transition shadow-lg"
+                    >
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+                <p class="text-xs text-gray-500 mt-2 text-center">
+                    💡 Ejemplos: "¿Cómo funciona la automatización?" • "¿Cuánto cuesta?" • "Quiero una demo"
+                </p>
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="mt-6 text-center">
+            <p class="text-gray-400 text-sm">
+                Este chatbot está funcionando con <strong class="text-amber-400">IA real</strong> • 
+                <a href="index.html#contacto" class="text-amber-400 hover:text-amber-300">Solicita el tuyo</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const chatForm = document.getElementById('chatForm');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // URL del webhook de n8n (REEMPLAZA CON TU URL)
+        const WEBHOOK_URL = 'https://heliosailabs.app.n8n.cloud/webhook/chatbot-groq';
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const mensaje = messageInput.value.trim();
+            if (!mensaje) return;
+
+            // Agregar mensaje del usuario
+            agregarMensaje(mensaje, 'user');
+            messageInput.value = '';
+            sendBtn.disabled = true;
+
+            // Mostrar indicador de escritura
+            const typingId = mostrarTyping();
+
+            try {
+                // Llamar al webhook de n8n
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mensaje: mensaje })
+                });
+
+                const data = await response.json();
+                
+                // Quitar indicador y mostrar respuesta
+                document.getElementById(typingId).remove();
+                agregarMensaje(data.respuesta, 'bot');
+                
+            } catch (error) {
+                document.getElementById(typingId).remove();
+                agregarMensaje('Lo siento, hubo un error. Por favor intenta de nuevo.', 'bot');
+            }
+
+            sendBtn.disabled = false;
+            messageInput.focus();
+        });
+
+        function agregarMensaje(texto, tipo) {
+            const isBot = tipo === 'bot';
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex items-start space-x-3 chat-bubble ${isBot ? '' : 'flex-row-reverse space-x-reverse'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="w-10 h-10 rounded-full ${isBot ? 'bg-gradient-to-br from-amber-500 to-yellow-500' : 'bg-gradient-to-br from-blue-500 to-indigo-500'} flex items-center justify-center flex-shrink-0">
+                    <i class="fas ${isBot ? 'fa-robot' : 'fa-user'} text-white"></i>
+                </div>
+                <div class="${isBot ? 'bg-white' : 'bg-gradient-to-br from-blue-500 to-indigo-500 text-white'} rounded-2xl ${isBot ? 'rounded-tl-none' : 'rounded-tr-none'} p-4 shadow-md max-w-md">
+                    <p class="${isBot ? 'text-gray-800' : 'text-white'}">${texto}</p>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function mostrarTyping() {
+            const id = 'typing-' + Date.now();
+            const typingDiv = document.createElement('div');
+            typingDiv.id = id;
+            typingDiv.className = 'flex items-start space-x-3';
+            typingDiv.innerHTML = `
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-robot text-white"></i>
+                </div>
+                <div class="bg-white rounded-2xl rounded-tl-none p-4 shadow-md">
+                    <div class="typing-indicator flex space-x-1">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return id;
+        }
+    </script>
+</body>
+</html>
