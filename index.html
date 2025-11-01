@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Ventaja Competitiva de Adoptar IA Ahora</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,7 +18,11 @@
             overflow-x: hidden;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
         /* Hero Section */
         .hero {
@@ -25,8 +33,17 @@
             margin-bottom: 60px;
             box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
         }
-        .hero h1 { font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .hero p { font-size: 1.3em; opacity: 0.95; }
+
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
 
         /* Curve Section */
         .curve-section {
@@ -37,101 +54,318 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .curve-section h2 { text-align: center; font-size: 2.2em; margin-bottom: 40px; color: #ffa500; }
-        .curve-container { position: relative; height: 400px; margin-bottom: 40px; }
-        svg { width: 100%; height: 100%; }
-        .curve-path { fill: none; stroke: #667eea; stroke-width: 3; filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5)); }
-        .area-fill { opacity: 0.2; }
-        .section-label { font-size: 12px; font-weight: bold; text-anchor: middle; }
-        .percentage { font-size: 18px; font-weight: bold; fill: #ffa500; text-anchor: middle; }
+
+        .curve-section h2 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 40px;
+            color: #ffa500;
+        }
+
+        .curve-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 40px;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .curve-path {
+            fill: none;
+            stroke: #667eea;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
+        }
+
+        .area-fill {
+            opacity: 0.2;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: bold;
+            text-anchor: middle;
+        }
+
+        .percentage {
+            font-size: 18px;
+            font-weight: bold;
+            fill: #ffa500;
+            text-anchor: middle;
+        }
 
         /* Comparison Cards */
-        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-bottom: 60px; }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
         .comparison-card {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-radius: 15px; padding: 30px; border: 2px solid rgba(102, 126, 234, 0.3);
-            transition: all 0.3s ease; position: relative; overflow: hidden;
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .comparison-card:hover { transform: translateY(-10px); border-color: #667eea; box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3); }
+
+        .comparison-card:hover {
+            transform: translateY(-10px);
+            border-color: #667eea;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
         .comparison-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 4px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
             background: linear-gradient(90deg, #667eea, #764ba2);
         }
-        .card-title { font-size: 1.5em; margin-bottom: 15px; color: #ffa500; }
-        .card-stat { font-size: 2.5em; font-weight: bold; color: #667eea; margin: 15px 0; }
-        .card-description { font-size: 1em; line-height: 1.6; opacity: 0.9; }
+
+        .card-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #ffa500;
+        }
+
+        .card-stat {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 15px 0;
+        }
+
+        .card-description {
+            font-size: 1em;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
 
         /* Impact Metrics */
         .impact-section {
             background: rgba(255, 165, 0, 0.1);
-            border-radius: 20px; padding: 40px; margin-bottom: 60px;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 60px;
             border: 2px solid rgba(255, 165, 0, 0.3);
         }
-        .impact-section h2 { text-align: center; font-size: 2.2em; margin-bottom: 40px; color: #ffa500; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
-        .metric-card { background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 15px; text-align: center; transition: all 0.3s ease; }
-        .metric-card:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.05); }
-        .metric-icon { font-size: 3em; margin-bottom: 15px; }
-        .metric-value { font-size: 2.5em; font-weight: bold; color: #ffa500; margin: 10px 0; }
-        .metric-label { font-size: 1.1em; opacity: 0.9; }
+
+        .impact-section h2 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 40px;
+            color: #ffa500;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .metric-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ffa500;
+            margin: 10px 0;
+        }
+
+        .metric-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
 
         /* Urgency Section */
         .urgency-section {
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-            border-radius: 20px; padding: 50px; margin-bottom: 60px; text-align: center;
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 60px;
+            text-align: center;
             box-shadow: 0 20px 60px rgba(255, 107, 107, 0.4);
         }
-        .urgency-section h2 { font-size: 2.5em; margin-bottom: 20px; }
-        .urgency-section p { font-size: 1.3em; line-height: 1.8; margin-bottom: 15px; }
-        .countdown { font-size: 3em; font-weight: bold; margin: 30px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+
+        .urgency-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .urgency-section p {
+            font-size: 1.3em;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .countdown {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 30px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
 
         /* Form Section */
         .form-section {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px; padding: 50px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .form-section h2 { text-align: center; font-size: 2.5em; margin-bottom: 15px; color: #ffa500; }
-        .form-subtitle { text-align: center; font-size: 1.2em; margin-bottom: 40px; opacity: 0.9; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 25px; }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group label { margin-bottom: 8px; font-weight: 600; color: #ffa500; }
-        .form-group input, .form-group select {
-            padding: 15px; border-radius: 10px; border: 2px solid rgba(102, 126, 234, 0.3);
-            background: rgba(255, 255, 255, 0.05); color: #000; font-size: 1em; transition: all 0.3s ease;
-        }
-        .form-group input:focus, .form-group select:focus {
-            outline: none; border-color: #667eea; background: rgba(255, 255, 255, 0.1);
-        }
-        .form-group input::placeholder { color: rgba(255, 255, 255, 0.4); }
-        .form-group select { cursor: pointer; }
-        .form-group select option { background: #1a1f3a; color: #fff; }
 
-        .submit-btn { width: 100%; padding: 20px; font-size: 1.3em; font-weight: bold; background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%); color: #fff; border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; }
-        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255, 165, 0, 0.4); }
-        .submit-btn:active { transform: translateY(0); }
-        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .success-message { display: none; background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); padding: 20px; border-radius: 10px; text-align: center; margin-top: 20px; font-size: 1.2em; }
+        .form-section h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: #ffa500;
+        }
+
+        .form-subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ffa500;
+        }
+
+        /* Aquí cambiamos el color de las letras para que sean visibles */
+        .form-group input,
+        .form-group select {
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            background: #fff; /* blanco */
+            color: #000; /* letras negras */
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #fff;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(0,0,0,0.5);
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-group select option {
+            background: #fff;
+            color: #000;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 165, 0, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            display: none;
+            background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
 
         /* Animations */
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeInUp 0.8s ease-out; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s ease-out;
+        }
 
         @media (max-width: 768px) {
             .hero h1 { font-size: 2em; }
             .hero p { font-size: 1em; }
             .form-grid { grid-template-columns: 1fr; }
-            .curve-container { height: 450px; } /* curva más grande en móvil */
-            .section-label { font-size: 12px; }
-            .percentage { font-size: 16px; }
+
+            /* Aumentamos altura de la curva en móvil para que se vea mejor */
+            .curve-container { height: 500px; }
+
+            .section-label { font-size: 10px; }
+            .percentage { font-size: 14px; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-
     <!-- Hero Section -->
     <div class="hero fade-in">
         <h1>⚡ La Ventaja Competitiva de Adoptar IA AHORA</h1>
@@ -289,15 +523,15 @@
             </div>
         </form>
     </div>
-
 </div>
 
 <script>
-document.getElementById('leadForm').addEventListener('submit', async function(e){
+document.getElementById('leadForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const submitBtn = this.querySelector('.submit-btn');
     submitBtn.disabled = true;
     submitBtn.textContent = '⏳ Enviando...';
+
     const formData = new FormData(this);
     const data = {
         nombre: formData.get('nombre'),
@@ -308,48 +542,51 @@ document.getElementById('leadForm').addEventListener('submit', async function(e)
         industria: formData.get('industria'),
         telegram: formData.get('telegram') || ''
     };
+
     try {
         const response = await fetch('https://heliosailabs.app.n8n.cloud/webhook/Calificación_Leads', {
-            method:'POST',
-            headers:{ 'Content-Type':'application/json' },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        if(response.ok){
-            document.getElementById('successMessage').style.display='block';
+        if (response.ok) {
+            document.getElementById('successMessage').style.display = 'block';
             this.reset();
-            submitBtn.textContent='✅ ¡Enviado!';
-            setTimeout(()=>{
-                document.getElementById('successMessage').style.display='none';
-                submitBtn.disabled=false;
-                submitBtn.textContent='🚀 Agendar Mi Demo Gratuita';
-            },5000);
-        } else { throw new Error('Error en la respuesta'); }
-    } catch(error){
+            submitBtn.textContent = '✅ ¡Enviado!';
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Agendar Mi Demo Gratuita';
+            }, 5000);
+        } else {
+            throw new Error('Error en la respuesta');
+        }
+    } catch (error) {
         alert('Hubo un error al enviar el formulario. Por favor intenta de nuevo o contáctanos directamente.');
-        submitBtn.disabled=false;
-        submitBtn.textContent='🚀 Agendar Mi Demo Gratuita';
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🚀 Agendar Mi Demo Gratuita';
     }
 });
 
-// Fade-in animations
-const observerOptions = { threshold:0.1, rootMargin:'0px 0px -100px 0px' };
-const observer = new IntersectionObserver(function(entries){
+// Intersection Observer for fade-in animations
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -100px 0px' };
+const observer = new IntersectionObserver(function(entries) {
     entries.forEach(entry => {
         if(entry.isIntersecting){
-            entry.target.style.opacity='1';
-            entry.target.style.transform='translateY(0)';
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
         }
     });
 }, observerOptions);
-document.querySelectorAll('.fade-in').forEach(el=>{
-    el.style.opacity='0';
-    el.style.transform='translateY(30px)';
-    el.style.transition='all 0.8s ease-out';
+document.querySelectorAll('.fade-in').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'all 0.8s ease-out';
     observer.observe(el);
 });
 </script>
-
 </body>
 </html>
+
 
 
