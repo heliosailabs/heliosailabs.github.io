@@ -64,7 +64,7 @@
 
         .curve-container {
             position: relative;
-            height: 450px; /* <-- más grande para móvil también */
+            height: 500px;
             margin-bottom: 40px;
         }
 
@@ -85,13 +85,13 @@
         }
 
         .section-label {
-            font-size: 12px;
+            font-size: 14px;
             font-weight: bold;
             text-anchor: middle;
         }
 
         .percentage {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             fill: #ffa500;
             text-anchor: middle;
@@ -230,20 +230,61 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* ✅ Form Section FIX */
+        /* Form Section */
+        .form-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-section h2 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            color: #ffa500;
+        }
+
+        .form-subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ffa500;
+        }
+
         .form-group input,
         .form-group select {
             padding: 15px;
             border-radius: 10px;
             border: 2px solid rgba(102, 126, 234, 0.3);
-            background: #ffffff; /* ✅ Fondo blanco */
-            color: #000000; /* ✅ Texto negro */
+            background: #ffffff;
+            color: #000000;
             font-size: 1em;
             transition: all 0.3s ease;
         }
 
         .form-group input:focus,
         .form-group select:focus {
+            outline: none;
             border-color: #667eea;
             background: #fff;
             color: #000;
@@ -251,7 +292,7 @@
         }
 
         .form-group input::placeholder {
-            color: #555;
+            color: #666;
         }
 
         .submit-btn {
@@ -265,7 +306,7 @@
             border-radius: 10px;
             cursor: pointer;
             margin-top: 20px;
-            transition: .3s;
+            transition: all 0.3s ease;
         }
 
         .submit-btn:hover {
@@ -273,15 +314,109 @@
             box-shadow: 0 10px 30px rgba(255, 165, 0, 0.4);
         }
 
-        /* ✅ Mobile Responsive Fix */
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            display: none;
+            background: #10b981;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .curve-container {
-                height: 450px; /* ✅ aumentada */
+                height: 600px;
             }
-            .hero h1 { font-size: 2em; }
-            .hero p { font-size: 1em; }
-            .section-label { font-size: 12px; }
-            .percentage { font-size: 16px; }
+            
+            .hero h1 {
+                font-size: 1.8em;
+            }
+            
+            .hero p {
+                font-size: 1em;
+            }
+            
+            .curve-section h2 {
+                font-size: 1.6em;
+            }
+            
+            .section-label {
+                font-size: 11px;
+            }
+            
+            .percentage {
+                font-size: 16px;
+            }
+            
+            .card-title {
+                font-size: 1.2em;
+            }
+            
+            .card-stat {
+                font-size: 2em;
+            }
+            
+            .urgency-section h2 {
+                font-size: 1.8em;
+            }
+            
+            .urgency-section p {
+                font-size: 1em;
+            }
+            
+            .countdown {
+                font-size: 2em;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .curve-container {
+                height: 500px;
+            }
+            
+            .hero {
+                padding: 40px 15px;
+            }
+            
+            .hero h1 {
+                font-size: 1.5em;
+            }
+            
+            .section-label {
+                font-size: 10px;
+            }
+            
+            .percentage {
+                font-size: 14px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -299,37 +434,33 @@
             <h2>📊 La Curva de Adopción de Innovación</h2>
             <div class="curve-container">
                 <svg viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet">
-
                     <!-- Bell Curve -->
-                    <path class="curve-path" d="M 50 350 Q 200 50, 350 350 Q 500 50, 650 350 Q 800 50, 950 350">
-                        <animate attributeName="stroke-dashoffset" from="2000" to="0" dur="2s" fill="freeze" />
-                    </path>
+                    <path class="curve-path" d="M 50 350 Q 200 50, 350 350 Q 500 50, 650 350 Q 800 50, 950 350"></path>
 
                     <!-- Innovadores -->
                     <path class="area-fill" d="M 50 350 Q 125 200, 200 350 Z" fill="#667eea"/>
-                    <text x="125" y="380" class="section-label">Innovadores</text>
+                    <text x="125" y="385" class="section-label">Innovadores</text>
                     <text x="125" y="320" class="percentage">2.5%</text>
 
                     <!-- Early Adopters -->
                     <path class="area-fill" d="M 200 350 Q 275 100, 350 350 Z" fill="#764ba2"/>
-                    <text x="275" y="380" class="section-label">Early Adopters</text>
+                    <text x="275" y="385" class="section-label">Early Adopters</text>
                     <text x="275" y="250" class="percentage">13.5%</text>
 
                     <!-- Mayoría Temprana -->
                     <path class="area-fill" d="M 350 350 Q 450 80, 550 350 Z" fill="#ffa500"/>
-                    <text x="450" y="380" class="section-label">Mayoría Temprana</text>
+                    <text x="450" y="385" class="section-label">Mayoría Temprana</text>
                     <text x="450" y="200" class="percentage">34%</text>
 
                     <!-- Mayoría Tardía -->
                     <path class="area-fill" d="M 550 350 Q 650 80, 750 350 Z" fill="#ff8c00"/>
-                    <text x="650" y="380" class="section-label">Mayoría Tardía</text>
+                    <text x="650" y="385" class="section-label">Mayoría Tardía</text>
                     <text x="650" y="200" class="percentage">34%</text>
 
                     <!-- Rezagados -->
                     <path class="area-fill" d="M 750 350 Q 825 200, 900 350 Z" fill="#ff6b6b"/>
-                    <text x="825" y="380" class="section-label">Rezagados</text>
+                    <text x="825" y="385" class="section-label">Rezagados</text>
                     <text x="825" y="320" class="percentage">16%</text>
-
                 </svg>
             </div>
 
@@ -337,24 +468,53 @@
                 <div class="comparison-card">
                     <div class="card-title">🚀 Innovadores + Early Adopters</div>
                     <div class="card-stat">16%</div>
-                    <div class="card-description"><strong>Ventaja:</strong> Dominan el mercado.</div>
+                    <div class="card-description"><strong>Ventaja:</strong> Dominan el mercado, establecen estándares y capturan la mayor participación de mercado.</div>
                 </div>
                 <div class="comparison-card">
                     <div class="card-title">📈 Mayoría Temprana</div>
                     <div class="card-stat">34%</div>
-                    <div class="card-description"><strong>Situación:</strong> Mantienen competitividad.</div>
+                    <div class="card-description"><strong>Situación:</strong> Mantienen competitividad adaptándose a tiempo, pero ya no lideran.</div>
                 </div>
                 <div class="comparison-card">
                     <div class="card-title">⚠️ Mayoría Tardía + Rezagados</div>
                     <div class="card-stat">50%</div>
-                    <div class="card-description"><strong>Riesgo:</strong> Competitividad mínima.</div>
+                    <div class="card-description"><strong>Riesgo:</strong> Competitividad mínima, luchan por sobrevivir mientras otros dominan.</div>
                 </div>
             </div>
         </div>
 
-        <!-- Urgency Section (Skipping rest to save length) -->
-        
-        <!-- Form Section ✅ -->
+        <!-- Impact Section -->
+        <div class="impact-section fade-in">
+            <h2>💰 El Costo de Esperar</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">📉</div>
+                    <div class="metric-value">-40%</div>
+                    <div class="metric-label">Pérdida de participación de mercado</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">💸</div>
+                    <div class="metric-value">3X</div>
+                    <div class="metric-label">Mayor costo de implementación tardía</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">⏰</div>
+                    <div class="metric-value">18-24</div>
+                    <div class="metric-label">Meses para alcanzar a competidores</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Urgency Section -->
+        <div class="urgency-section fade-in">
+            <h2>⚡ Por Qué AHORA es el Momento Crítico</h2>
+            <p><strong>La ventana de oportunidad se está cerrando.</strong></p>
+            <p>Quienes adopten IA en los próximos 6-12 meses ganarán ventaja competitiva decisiva.</p>
+            <p>Quienes esperen más allá de 2026 lucharán por alcanzar a la competencia.</p>
+            <div class="countdown">⏳ La decisión es AHORA</div>
+        </div>
+
+        <!-- Form Section -->
         <div class="form-section fade-in">
             <h2>🎯 Agenda tu Demo Gratuita</h2>
             <p class="form-subtitle">Descubre cómo la automatización puede transformar tu negocio</p>
@@ -385,27 +545,26 @@
                         <label>Industria *</label>
                         <select name="industria" required>
                             <option value="">Selecciona tu industria</option>
-                            <option>Salud</option>
-                            <option>Legal</option>
-                            <option>Inmobiliaria</option>
-                            <option>Educación</option>
-                            <option>Restaurante/Cafetería</option>
-                            <option>Otra</option>
+                            <option value="salud">Salud (Clínicas, Consultorios, Dentales)</option>
+                            <option value="legal">Legal (Despachos, Notarías)</option>
+                            <option value="inmobiliaria">Inmobiliaria</option>
+                            <option value="educacion">Educación</option>
+                            <option value="restaurante">Restaurante/Cafetería</option>
+                            <option value="otra">Otra</option>
                         </select>
                     </div>
                 </div>
 
                 <button type="submit" class="submit-btn">🚀 Agendar Mi Demo Gratuita</button>
                 <div class="success-message" id="successMessage">
-                    ✅ ¡Gracias! Tu solicitud ha sido enviada.
+                    ✅ ¡Gracias! Tu solicitud ha sido enviada. Te contactaremos pronto.
                 </div>
-
             </form>
         </div>
     </div>
 
     <script>
-        // Submit Handler
+        // Form submission handler
         document.getElementById('leadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const submitBtn = this.querySelector('.submit-btn');
@@ -426,18 +585,22 @@
                     document.getElementById('successMessage').style.display = 'block';
                     this.reset();
                     submitBtn.textContent = '✅ ¡Enviado!';
-                } else throw new Error();
+                    
+                    setTimeout(() => {
+                        submitBtn.textContent = '🚀 Agendar Mi Demo Gratuita';
+                        document.getElementById('successMessage').style.display = 'none';
+                    }, 5000);
+                } else {
+                    throw new Error('Error en la respuesta');
+                }
 
-            } catch {
-                alert('Error al enviar formulario');
+            } catch (error) {
+                alert('Error al enviar el formulario. Por favor intenta de nuevo.');
                 submitBtn.textContent = '🚀 Agendar Mi Demo Gratuita';
+                console.error(error);
             }
 
-            setTimeout(() => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '🚀 Agendar Mi Demo Gratuita';
-                document.getElementById('successMessage').style.display = 'none';
-            }, 4000);
+            submitBtn.disabled = false;
         });
     </script>
 </body>
