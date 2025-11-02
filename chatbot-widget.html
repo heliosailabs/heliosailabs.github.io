@@ -55,7 +55,7 @@
                         <i class="fas fa-robot text-white"></i>
                     </div>
                     <div class="bg-white rounded-2xl rounded-tl-none p-4 shadow-md max-w-md">
-                        <p class="text-gray-800">¡Hola! Soy el asistente virtual de HELIOS AI LABS. Puedo responder tus preguntas sobre automatización con IA para tu negocio. ¿En qué te puedo ayudar?</p>
+                        <p class="text-gray-800">¡Hola! Soy Helios, director comercial de Helios AI Labs. Es un placer atenderle. ¿Con quién tengo el gusto de conversar?</p>
                     </div>
                 </div>
             </div>
@@ -79,7 +79,7 @@
                     </button>
                 </form>
                 <p class="text-xs text-gray-500 mt-2 text-center">
-                    💡 Ejemplos: "¿Cómo funciona la automatización?" • "¿Cuánto cuesta?" • "Quiero una demo"
+                    💡 Ejemplos: "¿Cómo funciona la automatización?" • "¿Cuánto cuesta?" • "Quiero una asesoría"
                 </p>
             </div>
         </div>
@@ -99,8 +99,16 @@
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
 
-        // URL del webhook de n8n (REEMPLAZA CON TU URL)
+        // URL del webhook de n8n
         const WEBHOOK_URL = 'https://heliosailabs369.app.n8n.cloud/webhook/chatbot-groq';
+
+        // 🆕 GENERAR SESSION ID ÚNICO POR USUARIO
+        let sessionId = localStorage.getItem('helios_session_id');
+        if (!sessionId) {
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('helios_session_id', sessionId);
+        }
+        console.log('🔑 Session ID activo:', sessionId);
 
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -116,20 +124,30 @@
             const typingId = mostrarTyping();
 
             try {
-                // Llamar al webhook de n8n
+                // 🆕 ENVIAR sessionId JUNTO CON EL MENSAJE
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mensaje: mensaje })
+                    body: JSON.stringify({ 
+                        mensaje: mensaje,
+                        sessionId: sessionId
+                    })
                 });
 
                 const data = await response.json();
                 
                 // Quitar indicador y mostrar respuesta
                 document.getElementById(typingId).remove();
-                agregarMensaje(data.respuesta, 'bot');
+                
+                // 🆕 DETECTAR SI HAY LINK DE CALENDLY
+                if (data.respuesta.includes('calendly.com')) {
+                    agregarMensajeConCalendly(data.respuesta);
+                } else {
+                    agregarMensaje(data.respuesta, 'bot');
+                }
                 
             } catch (error) {
+                console.error('Error:', error);
                 document.getElementById(typingId).remove();
                 agregarMensaje('Lo siento, hubo un error. Por favor intenta de nuevo.', 'bot');
             }
@@ -149,6 +167,32 @@
                 </div>
                 <div class="${isBot ? 'bg-white' : 'bg-gradient-to-br from-blue-500 to-indigo-500 text-white'} rounded-2xl ${isBot ? 'rounded-tl-none' : 'rounded-tr-none'} p-4 shadow-md max-w-md">
                     <p class="${isBot ? 'text-gray-800' : 'text-white'}">${texto}</p>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function agregarMensajeConCalendly(texto) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex items-start space-x-3 chat-bubble';
+            
+            // Extraer URL de Calendly si existe
+            const calendlyMatch = texto.match(/https:\/\/calendly\.com\/[^\s)]+/);
+            const calendlyUrl = calendlyMatch ? calendlyMatch[0] : '';
+            
+            messageDiv.innerHTML = `
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-robot text-white"></i>
+                </div>
+                <div class="bg-white rounded-2xl rounded-tl-none p-4 shadow-md max-w-md">
+                    <p class="text-gray-800 mb-3">${texto}</p>
+                    ${calendlyUrl ? `
+                        <a href="${calendlyUrl}" target="_blank" class="inline-block bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-amber-600 hover:to-yellow-600 transition shadow-lg">
+                            <i class="fas fa-calendar-alt mr-2"></i>Agendar Ahora
+                        </a>
+                    ` : ''}
                 </div>
             `;
             
