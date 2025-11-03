@@ -99,7 +99,7 @@
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
 
-        // URL del webhook de n8n
+        // ✅ URL CORRECTA DEL WEBHOOK DEL CHATBOT GROQ
         const WEBHOOK_URL = 'https://heliosailabs369.app.n8n.cloud/webhook/chatbot-groq';
 
         // 🆕 GENERAR SESSION ID ÚNICO POR USUARIO
@@ -139,9 +139,9 @@
                 // Quitar indicador y mostrar respuesta
                 document.getElementById(typingId).remove();
                 
-                // 🆕 DETECTAR SI HAY LINK DE CALENDLY
-                if (data.respuesta.includes('calendly.com')) {
-                    agregarMensajeConCalendly(data.respuesta);
+                // 🆕 DETECTAR SI HAY LINK DE CAL.COM (NO CALENDLY)
+                if (data.respuesta.includes('cal.com')) {
+                    agregarMensajeConCalCom(data.respuesta);
                 } else {
                     agregarMensaje(data.respuesta, 'bot');
                 }
@@ -174,13 +174,13 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        function agregarMensajeConCalendly(texto) {
+        function agregarMensajeConCalCom(texto) {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'flex items-start space-x-3 chat-bubble';
             
-            // Extraer URL de Calendly si existe
-            const calendlyMatch = texto.match(/https:\/\/calendly\.com\/[^\s)]+/);
-            const calendlyUrl = calendlyMatch ? calendlyMatch[0] : '';
+            // Extraer URL de Cal.com si existe
+            const calComMatch = texto.match(/https:\/\/cal\.com\/[^\s)]+/);
+            const calComUrl = calComMatch ? calComMatch[0] : '';
             
             messageDiv.innerHTML = `
                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center flex-shrink-0">
@@ -188,8 +188,8 @@
                 </div>
                 <div class="bg-white rounded-2xl rounded-tl-none p-4 shadow-md max-w-md">
                     <p class="text-gray-800 mb-3">${texto}</p>
-                    ${calendlyUrl ? `
-                        <a href="${calendlyUrl}" target="_blank" class="inline-block bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-amber-600 hover:to-yellow-600 transition shadow-lg">
+                    ${calComUrl ? `
+                        <a href="${calComUrl}" target="_blank" class="inline-block bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-amber-600 hover:to-yellow-600 transition shadow-lg">
                             <i class="fas fa-calendar-alt mr-2"></i>Agendar Ahora
                         </a>
                     ` : ''}
