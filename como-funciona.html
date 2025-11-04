@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cómo Funciona - HELIOS AI LABS</title>
+    <title>Calculadora ROI - HELIOS AI LABS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -13,13 +13,6 @@
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-        .problem-card {
-            transition: all 0.3s ease;
-        }
-        .problem-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
         .back-button {
             transition: all 0.3s ease;
@@ -42,8 +35,8 @@
                 <a href="index.html" class="back-button text-gray-300 hover:text-amber-400 font-semibold hidden md:flex items-center">
                     <i class="fas fa-arrow-left mr-2"></i>Inicio
                 </a>
-                <a href="calculadora-roi.html" class="text-amber-400 hover:text-amber-300 font-semibold hidden md:block">
-                    <i class="fas fa-calculator mr-2"></i>Calculadora ROI
+                <a href="como-funciona.html" class="text-amber-400 hover:text-amber-300 font-semibold hidden md:block">
+                    <i class="fas fa-lightbulb mr-2"></i>Cómo Funciona
                 </a>
                 <a href="index.html#contacto" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-6 py-2 rounded-lg font-semibold hover:from-amber-600 hover:to-yellow-600 transition">
                     Agendar Demo
@@ -62,599 +55,272 @@
     <section class="py-20 px-4">
         <div class="max-w-5xl mx-auto text-center">
             <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-                ¿Cómo Funciona la <span class="gradient-text">Automatización con IA?</span>
+                Calculadora de <span class="gradient-text">Retorno de Inversión (ROI)</span>
             </h1>
             <p class="text-2xl text-gray-600 mb-8">
-                Explicado con lenguaje coloquial,de manera simple y sin tecnicismos
+                Descubre cuánto dinero estás perdiendo ahora y cuánto ganarías con IA
             </p>
             <div class="bg-amber-100 border-2 border-amber-300 rounded-xl p-6 inline-block">
                 <p class="text-lg text-gray-800">
-                    <strong>💡 Piénsalo así:</strong> Es como contratar empleados que <strong>nunca se cansan, nunca se enferman, trabajan 24/7</strong> y cuestan menos que un café diario.
+                    <strong>💰 En 2 minutos</strong> sabrás exactamente cuánto dinero recuperarás cada mes
                 </p>
             </div>
         </div>
     </section>
 
-    <!-- 10 Problemas Comunes -->
+    <!-- Calculadora -->
     <section class="py-12 px-4">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">
-                    10 Problemas Que Resolvemos
-                </h2>
-                <p class="text-xl text-gray-600">
-                    Sin promesas mágicas. Con resultados medibles y garantizados.
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+                
+                <!-- Inputs -->
+                <div class="space-y-8 mb-12">
+                    
+                    <!-- Input 1: Llamadas semanales -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-900 mb-3">
+                            1. ¿Cuántas llamadas recibes por semana? <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex items-center space-x-4">
+                            <input 
+                                type="range" 
+                                id="llamadas" 
+                                min="10" 
+                                max="500" 
+                                value="100" 
+                                class="flex-1 h-3 bg-amber-200 rounded-lg appearance-none cursor-pointer"
+                                oninput="calcularROI()"
+                            >
+                            <div class="w-24 bg-amber-500 text-white text-center py-2 rounded-lg font-bold text-xl">
+                                <span id="llamadas-value">100</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input 2: Porcentaje perdido -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-900 mb-3">
+                            2. ¿Qué % de llamadas NO contestas? <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex items-center space-x-4">
+                            <input 
+                                type="range" 
+                                id="porcentaje" 
+                                min="10" 
+                                max="90" 
+                                value="30" 
+                                class="flex-1 h-3 bg-orange-200 rounded-lg appearance-none cursor-pointer"
+                                oninput="calcularROI()"
+                            >
+                            <div class="w-24 bg-orange-500 text-white text-center py-2 rounded-lg font-bold text-xl">
+                                <span id="porcentaje-value">30</span>%
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input 3: Valor promedio -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-900 mb-3">
+                            3. ¿Cuánto vale un cliente promedio? (MXN) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex items-center space-x-4">
+                            <input 
+                                type="range" 
+                                id="valor" 
+                                min="500" 
+                                max="10000" 
+                                step="100"
+                                value="2000" 
+                                class="flex-1 h-3 bg-green-200 rounded-lg appearance-none cursor-pointer"
+                                oninput="calcularROI()"
+                            >
+                            <div class="w-32 bg-green-500 text-white text-center py-2 rounded-lg font-bold text-xl">
+                                $<span id="valor-value">2,000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input 4: Tasa conversión -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-900 mb-3">
+                            4. ¿Qué % de personas que contactan se convierten en clientes? <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex items-center space-x-4">
+                            <input 
+                                type="range" 
+                                id="conversion" 
+                                min="5" 
+                                max="80" 
+                                value="25" 
+                                class="flex-1 h-3 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+                                oninput="calcularROI()"
+                            >
+                            <div class="w-24 bg-blue-500 text-white text-center py-2 rounded-lg font-bold text-xl">
+                                <span id="conversion-value">25</span>%
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Resultados -->
+                <div class="border-t-4 border-amber-500 pt-8">
+                    <h3 class="text-3xl font-bold text-gray-900 mb-8 text-center">
+                        📊 Tus Resultados
+                    </h3>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        
+                        <!-- Pérdida actual -->
+                        <div class="bg-red-50 border-2 border-red-300 rounded-xl p-6">
+                            <p class="text-sm font-bold text-red-600 uppercase mb-2">❌ Estás Perdiendo</p>
+                            <p class="text-4xl font-bold text-red-600 mb-2">
+                                $<span id="perdida-mensual">0</span>
+                            </p>
+                            <p class="text-sm text-gray-600">Por mes</p>
+                            <p class="text-2xl font-bold text-red-700 mt-4">
+                                $<span id="perdida-anual">0</span> / año
+                            </p>
+                        </div>
+
+                        <!-- Ganancia con IA -->
+                        <div class="bg-green-50 border-2 border-green-300 rounded-xl p-6">
+                            <p class="text-sm font-bold text-green-600 uppercase mb-2">✅ Ganarías Con IA</p>
+                            <p class="text-4xl font-bold text-green-600 mb-2">
+                                $<span id="ganancia-mensual">0</span>
+                            </p>
+                            <p class="text-sm text-gray-600">Por mes</p>
+                            <p class="text-2xl font-bold text-green-700 mt-4">
+                                $<span id="ganancia-anual">0</span> / año
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <!-- ROI -->
+                    <div class="bg-gradient-to-r from-amber-500 to-yellow-500 rounded-xl p-8 text-center text-white">
+                        <p class="text-lg font-bold mb-2">🚀 RETORNO DE INVERSIÓN (ROI)</p>
+                        <p class="text-6xl font-bold mb-4">
+                            <span id="roi-porcentaje">0</span>%
+                        </p>
+                        <p class="text-xl">
+                            Por cada $1 que inviertes, recuperas <strong>$<span id="roi-multiplicador">0</span></strong>
+                        </p>
+                        <p class="text-sm mt-4 opacity-90">
+                            La inversión se recupera en <strong><span id="meses-recuperacion">0</span> mes(es)</strong>
+                        </p>
+                    </div>
+
+                    <!-- Desglose adicional -->
+                    <div class="mt-8 grid md:grid-cols-3 gap-4">
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-gray-600 mb-1">Llamadas perdidas/mes</p>
+                            <p class="text-2xl font-bold text-gray-900"><span id="llamadas-perdidas">0</span></p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-gray-600 mb-1">Clientes perdidos/mes</p>
+                            <p class="text-2xl font-bold text-gray-900"><span id="clientes-perdidos">0</span></p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-gray-600 mb-1">Clientes recuperados con IA</p>
+                            <p class="text-2xl font-bold text-green-600"><span id="clientes-recuperados">0</span></p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- CTA -->
+                <div class="mt-12 text-center">
+                    <a href="index.html#contacto" class="inline-block bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-12 py-5 rounded-xl font-bold text-xl hover:from-amber-600 hover:to-yellow-600 transition shadow-2xl">
+                        <i class="fas fa-calendar-check mr-2"></i>
+                        Quiero Recuperar Este Dinero - Agendar Demo
+                    </a>
+                    <p class="text-sm text-gray-600 mt-4">
+                        Demo gratuita de 30 minutos • Sin compromiso • Resultados garantizados
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Nota aclaratoria -->
+    <section class="py-12 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-blue-50 border-2 border-blue-300 rounded-xl p-6">
+                <p class="text-sm text-gray-700">
+                    <strong>📋 Nota:</strong> Estos cálculos son estimaciones conservadoras basadas en promedios de la industria. Los resultados reales varían según tu negocio específico. Nuestro sistema de IA tiene una efectividad promedio del 85% en captura de leads y reducción de 70% en no-shows según casos documentados.
                 </p>
             </div>
-
-            <div class="space-y-8">
-                
-                <!-- Problema 1 -->
-                <div class="problem-card bg-white rounded-2xl p-8 shadow-lg border-l-8 border-red-500">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="flex items-center mb-4">
-                                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-phone-slash text-3xl text-red-600"></i>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-bold text-red-600 uppercase">Problema #1</span>
-                                    <h3 class="text-2xl font-bold text-gray-900">Llamadas Perdidas = Dinero Perdido</h3>
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-4">
-                                <strong>La situación:</strong> Tu secretaria está ocupada, suena el teléfono, nadie contesta. Ese cliente se va con la competencia. Pierdes entre 20-40 llamadas por semana.
-                            </p>
-                            <div class="bg-red-50 p-4 rounded-lg">
-                                <p class="font-bold text-red-800 mb-2">📉 Pérdida Promedio:</p>
-                                <p class="text-2xl font-bold text-red-600">$15,000 - $40,000 MXN/mes</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-300">
-                                <h4 class="font-bold text-green-800 mb-4 flex items-center">
-                                    <i class="fas fa-check-circle mr-2"></i>
-                                    Nuestra Solución
-                                </h4>
-                                <p class="text-gray-700 mb-4">
-                                    <strong>Asistente Virtual IA</strong> que contesta TODAS las llamadas al instante, 24/7. Habla como humano, agenda citas, responde preguntas.
-                                </p>
-                                <div class="space-y-2">
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span><strong>100%</strong> de llamadas atendidas</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span><strong>0</strong> llamadas perdidas</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Funciona de noche, fines de semana, siempre</span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-green-200">
-                                    <p class="font-bold text-green-800">✅ Resultado Garantizado:</p>
-                                    <p class="text-lg font-bold text-green-600">+40% más clientes capturados</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Problema 2 -->
-                <div class="problem-card bg-white rounded-2xl p-8 shadow-lg border-l-8 border-orange-500">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="flex items-center mb-4">
-                                <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-user-times text-3xl text-orange-600"></i>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-bold text-orange-600 uppercase">Problema #2</span>
-                                    <h3 class="text-2xl font-bold text-gray-900">Clientes Que No Llegan (No-Shows)</h3>
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-4">
-                                <strong>La situación:</strong> Agendas 50 citas, 15-20 personas simplemente no llegan. Pierdes horas de trabajo, dinero, y espacios que pudieron ocupar otros clientes.
-                            </p>
-                            <div class="bg-orange-50 p-4 rounded-lg">
-                                <p class="font-bold text-orange-800 mb-2">📉 Pérdida Promedio:</p>
-                                <p class="text-2xl font-bold text-orange-600">30-40% de citas perdidas</p>
-                                <p class="text-sm text-gray-600 mt-1">= $20,000 - $60,000 MXN/mes en ingresos no percibidos</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-300">
-                                <h4 class="font-bold text-green-800 mb-4 flex items-center">
-                                    <i class="fas fa-check-circle mr-2"></i>
-                                    Nuestra Solución
-                                </h4>
-                                <p class="text-gray-700 mb-4">
-                                    <strong>Sistema de Recordatorios Inteligente</strong> que envía mensajes automáticos por WhatsApp, SMS y llamadas 24h antes, 2h antes, y si no confirman, los persigue.
-                                </p>
-                                <div class="space-y-2">
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Recordatorios automáticos multi-canal</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Lista de espera que llena huecos al instante</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Confirmación obligatoria antes de la cita</span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-green-200">
-                                    <p class="font-bold text-green-800">✅ Resultado Garantizado:</p>
-                                    <p class="text-lg font-bold text-green-600">-70% reducción de no-shows</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Problema 3 -->
-                <div class="problem-card bg-white rounded-2xl p-8 shadow-lg border-l-8 border-purple-500">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="flex items-center mb-4">
-                                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-clock text-3xl text-purple-600"></i>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-bold text-purple-600 uppercase">Problema #3</span>
-                                    <h3 class="text-2xl font-bold text-gray-900">Solo Trabajas 9-5pm (Pierdes Clientes Nocturnos)</h3>
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-4">
-                                <strong>La situación:</strong> El 60% de las personas buscan servicios después de las 6pm o fines de semana. Llaman, nadie contesta, se van con quien sí les responde.
-                            </p>
-                            <div class="bg-purple-50 p-4 rounded-lg">
-                                <p class="font-bold text-purple-800 mb-2">📉 Pérdida Promedio:</p>
-                                <p class="text-2xl font-bold text-purple-600">60% de leads nocturnos perdidos</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-300">
-                                <h4 class="font-bold text-green-800 mb-4 flex items-center">
-                                    <i class="fas fa-check-circle mr-2"></i>
-                                    Nuestra Solución
-                                </h4>
-                                <p class="text-gray-700 mb-4">
-                                    <strong>Operación 24/7/365</strong>. El sistema nunca duerme. Atiende a las 3am igual que a las 3pm. No hay vacaciones, ni días festivos.
-                                </p>
-                                <div class="space-y-2">
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Atención automática 24 horas</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Capta leads mientras duermes</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Fines de semana funcionando al 100%</span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-green-200">
-                                    <p class="font-bold text-green-800">✅ Resultado Garantizado:</p>
-                                    <p class="text-lg font-bold text-green-600">+50% más capacidad de atención</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Problema 4 -->
-                <div class="problem-card bg-white rounded-2xl p-8 shadow-lg border-l-8 border-blue-500">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="flex items-center mb-4">
-                                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-comments text-3xl text-blue-600"></i>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-bold text-blue-600 uppercase">Problema #4</span>
-                                    <h3 class="text-2xl font-bold text-gray-900">Mensajes de WhatsApp/Redes Sin Responder</h3>
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-4">
-                                <strong>La situación:</strong> Recibes 50 mensajes al día en WhatsApp, Facebook, Instagram. Respondes 20. Los otros 30 se van con la competencia que sí les contestó.
-                            </p>
-                            <div class="bg-blue-50 p-4 rounded-lg">
-                                <p class="font-bold text-blue-800 mb-2">📉 Pérdida Promedio:</p>
-                                <p class="text-2xl font-bold text-blue-600">60-70% de mensajes sin respuesta</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-300">
-                                <h4 class="font-bold text-green-800 mb-4 flex items-center">
-                                    <i class="fas fa-check-circle mr-2"></i>
-                                    Nuestra Solución
-                                </h4>
-                                <p class="text-gray-700 mb-4">
-                                    <strong>Agente IA Multi-Canal</strong> que responde TODOS los mensajes en segundos. WhatsApp, Facebook, Instagram, TikTok. Todo desde un solo lugar.
-                                </p>
-                                <div class="space-y-2">
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Respuesta en menos de 30 segundos</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Entiende texto Y audio</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Filtra leads serios de curiosos</span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-green-200">
-                                    <p class="font-bold text-green-800">✅ Resultado Garantizado:</p>
-                                    <p class="text-lg font-bold text-green-600">100% de mensajes respondidos al instante</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Problema 5 -->
-                <div class="problem-card bg-white rounded-2xl p-8 shadow-lg border-l-8 border-pink-500">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="flex items-center mb-4">
-                                <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-user-clock text-3xl text-pink-600"></i>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-bold text-pink-600 uppercase">Problema #5</span>
-                                    <h3 class="text-2xl font-bold text-gray-900">Tu Equipo Pierde Horas en Tareas Repetitivas</h3>
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-4">
-                                <strong>La situación:</strong> Tu secretaria/asistente pasa 4-6 horas diarias agendando citas, confirmando, reagendando, enviando recordatorios. Eso es prácticamente su trabajo completo.
-                            </p>
-                            <div class="bg-pink-50 p-4 rounded-lg">
-                                <p class="font-bold text-pink-800 mb-2">📉 Costo Real:</p>
-                                <p class="text-2xl font-bold text-pink-600">20-30 horas/semana desperdiciadas</p>
-                                <p class="text-sm text-gray-600 mt-1">Que podrían usarse en ventas reales o atención al cliente</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-300">
-                                <h4 class="font-bold text-green-800 mb-4 flex items-center">
-                                    <i class="fas fa-check-circle mr-2"></i>
-                                    Nuestra Solución
-                                </h4>
-                                <p class="text-gray-700 mb-4">
-                                    <strong>Automatización Total</strong> de todo el proceso. El sistema hace TODO: agenda, confirma, reagenda, envía recordatorios, gestiona lista de espera.
-                                </p>
-                                <div class="space-y-2">
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Cero tiempo en tareas administrativas</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Tu equipo se enfoca en lo importante</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Sin errores humanos en agendas</span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-green-200">
-                                    <p class="font-bold text-green-800">✅ Resultado Garantizado:</p>
-                                    <p class="text-lg font-bold text-green-600">75% tiempo administrativo ahorrado</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Problema 6 -->
-                <div class="problem-card bg-white rounded-2xl p-8 shadow-lg border-l-8 border-indigo-500">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="flex items-center mb-4">
-                                <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-users-slash text-3xl text-indigo-600"></i>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-bold text-indigo-600 uppercase">Problema #6</span>
-                                    <h3 class="text-2xl font-bold text-gray-900">Dependes de Una Persona (Si Falta, Todo Se Detiene)</h3>
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-4">
-                                <strong>La situación:</strong> Tu secretaria se enferma, está de vacaciones, o renuncia. Tu negocio queda paralizado. Nadie contesta, nadie agenda, todo el sistema colapsa.
-                            </p>
-                            <div class="bg-indigo-50 p-4 rounded-lg">
-                                <p class="font-bold text-indigo-800 mb-2">📉 Riesgo:</p>
-                                <p class="text-2xl font-bold text-indigo-600">1 persona = punto único de fallo</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-300">
-                                <h4 class="font-bold text-green-800 mb-4 flex items-center">
-                                    <i class="fas fa-check-circle mr-2"></i>
-                                    Nuestra Solución
-                                </h4>
-                                <p class="text-gray-700 mb-4">
-                                    <strong>Sistema Infalible</strong>. No se enferma, no renuncia, no pide vacaciones. Funciona SIEMPRE. Tu negocio es completamente independiente de cualquier persona.
-                                </p>
-                                <div class="space-y-2">
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Cero dependencia de empleados</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Operación continua garantizada</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Reduce costos de personal hasta 60%</span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-green-200">
-                                    <p class="font-bold text-green-800">✅ Resultado Garantizado:</p>
-                                    <p class="text-lg font-bold text-green-600">100% uptime, 365 días al año</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Problema 7 -->
-                <div class="problem-card bg-white rounded-2xl p-8 shadow-lg border-l-8 border-yellow-500">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="flex items-center mb-4">
-                                <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-exclamation-triangle text-3xl text-yellow-600"></i>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-bold text-yellow-600 uppercase">Problema #7</span>
-                                    <h3 class="text-2xl font-bold text-gray-900">Errores Humanos en Agendas (Doble Cita, Hora Equivocada)</h3>
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-4">
-                                <strong>La situación:</strong> Agenda manual = errores. Dos pacientes a la misma hora. Cita mal anotada. Cliente llega y "no está en la agenda". Quejas, mala reputación.
-                            </p>
-                            <div class="bg-yellow-50 p-4 rounded-lg">
-                                <p class="font-bold text-yellow-800 mb-2">📉 Consecuencia:</p>
-                                <p class="text-2xl font-bold text-yellow-600">Clientes molestos = Reseñas negativas</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-300">
-                                <h4 class="font-bold text-green-800 mb-4 flex items-center">
-                                    <i class="fas fa-check-circle mr-2"></i>
-                                    Nuestra Solución
-                                </h4>
-                                <p class="text-gray-700 mb-4">
-                                    <strong>Precisión del 100%</strong>. El sistema verifica disponibilidad en tiempo real. IMPOSIBLE agendar dos personas al mismo tiempo. Todo sincronizado automáticamente.
-                                </p>
-                                <div class="space-y-2">
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Cero errores de agendamiento</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Sincronización automática con Google/Outlook</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Confirmaciones automáticas por email/SMS</span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-green-200">
-                                    <p class="font-bold text-green-800">✅ Resultado Garantizado:</p>
-                                    <p class="text-lg font-bold text-green-600">0% errores de agendamiento</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Problema 8 -->
-                <div class="problem-card bg-white rounded-2xl p-8 shadow-lg border-l-8 border-teal-500">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="flex items-center mb-4">
-                                <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-funnel-dollar text-3xl text-teal-600"></i>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-bold text-teal-600 uppercase">Problema #8</span>
-                                    <h3 class="text-2xl font-bold text-gray-900">No Sabes Cuántos Leads Pierdes (No Tienes Datos)</h3>
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-4">
-                                <strong>La situación:</strong> No tienes idea de cuántas personas te contactan y NO se convierten. ¿Llamadas perdidas? ¿Mensajes sin responder? No hay registro, no hay seguimiento.
-                            </p>
-                            <div class="bg-teal-50 p-4 rounded-lg">
-                                <p class="font-bold text-teal-800 mb-2">📉 Problema:</p>
-                                <p class="text-2xl font-bold text-teal-600">No puedes mejorar lo que no mides</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-300">
-                                <h4 class="font-bold text-green-800 mb-4 flex items-center">
-                                    <i class="fas fa-check-circle mr-2"></i>
-                                    Nuestra Solución
-                                </h4>
-                                <p class="text-gray-700 mb-4">
-                                    <strong>Dashboard Completo</strong> que muestra TODO: cuántos leads llegan, cuántos se convierten, de dónde vienen, cuánto dinero generas. Datos reales, en tiempo real.
-                                </p>
-                                <div class="space-y-2">
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Métricas en tiempo real</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Reportes automáticos semanales/mensuales</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>ROI visible: ves exactamente cuánto ganas</span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-green-200">
-                                    <p class="font-bold text-green-800">✅ Resultado Garantizado:</p>
-                                    <p class="text-lg font-bold text-green-600">100% visibilidad de tu negocio</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Problema 9 -->
-                <div class="problem-card bg-white rounded-2xl p-8 shadow-lg border-l-8 border-cyan-500">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="flex items-center mb-4">
-                                <div class="w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-hand-holding-usd text-3xl text-cyan-600"></i>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-bold text-cyan-600 uppercase">Problema #9</span>
-                                    <h3 class="text-2xl font-bold text-gray-900">Costos de Personal Cada Vez Más Altos</h3>
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-4">
-                                <strong>La situación:</strong> Secretaria: $8,000-12,000/mes + prestaciones (30%) = $14,000/mes real. Community manager: $10,000-15,000/mes. Costos que solo suben.
-                            </p>
-                            <div class="bg-cyan-50 p-4 rounded-lg">
-                                <p class="font-bold text-cyan-800 mb-2">📉 Costo Real:</p>
-                                <p class="text-2xl font-bold text-cyan-600">$14,000 - $25,000 MXN/mes</p>
-                                <p class="text-sm text-gray-600 mt-1">Por funciones que una IA hace mejor</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-300">
-                                <h4 class="font-bold text-green-800 mb-4 flex items-center">
-                                    <i class="fas fa-check-circle mr-2"></i>
-                                    Nuestra Solución
-                                </h4>
-                                <p class="text-gray-700 mb-4">
-                                    <strong>Desde $3,800/mes</strong> tienes un asistente que nunca falta, nunca pide aumento, trabaja 24/7 y hace el trabajo de 3 personas.
-                                </p>
-                                <div class="space-y-2">
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Ahorro mínimo: 60% vs empleado</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Sin prestaciones, vacaciones, ni ausencias</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Capacidad de 3 personas por precio de 0.5</span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-green-200">
-                                    <p class="font-bold text-green-800">✅ Resultado Garantizado:</p>
-                                    <p class="text-lg font-bold text-green-600">-73% reducción de costos operativos</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Problema 10 -->
-                <div class="problem-card bg-white rounded-2xl p-8 shadow-lg border-l-8 border-rose-500">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="flex items-center mb-4">
-                                <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-chart-line text-3xl text-rose-600"></i>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-bold text-rose-600 uppercase">Problema #10</span>
-                                    <h3 class="text-2xl font-bold text-gray-900">Tu Competencia Ya Usa IA (Te Estás Quedando Atrás)</h3>
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-4">
-                                <strong>La situación:</strong> Mientras tú pierdes llamadas, tu competencia las contesta en 10 segundos. Mientras tú cierras a las 6pm, ellos atienden 24/7. Te están quitando clientes.
-                            </p>
-                            <div class="bg-rose-50 p-4 rounded-lg">
-                                <p class="font-bold text-rose-800 mb-2">⚠️ Realidad:</p>
-                                <p class="text-2xl font-bold text-rose-600">Las empresas con IA crecen 3X más rápido</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-300">
-                                <h4 class="font-bold text-green-800 mb-4 flex items-center">
-                                    <i class="fas fa-check-circle mr-2"></i>
-                                    Nuestra Solución
-                                </h4>
-                                <p class="text-gray-700 mb-4">
-                                    <strong>Implementación en 5 días</strong>. No esperes meses. En una semana estás operando con IA, recuperando leads perdidos, y superando a tu competencia.
-                                </p>
-                                <div class="space-y-2">
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Setup completo en 5 días hábiles</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Ventaja competitiva inmediata</span>
-                                    </div>
-                                    <div class="flex items-center text-green-700">
-                                        <i class="fas fa-arrow-right mr-2"></i>
-                                        <span>Tú respondes, tu competencia pierde</span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-green-200">
-                                    <p class="font-bold text-green-800">✅ Resultado Garantizado:</p>
-                                    <p class="text-lg font-bold text-green-600">Ventaja competitiva medible en 30 días</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
         </div>
     </section>
 
-    <!-- CTA Final -->
-    <section class="py-20 px-4 bg-gradient-to-r from-slate-900 to-slate-800">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-4xl font-bold text-white mb-6">
-                ¿Listo para Resolver Estos Problemas?
-            </h2>
-            <p class="text-xl text-gray-300 mb-8">
-                Agenda una demo gratuita y te mostramos cómo funciona en TU negocio específico
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="index.html#contacto" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-12 py-5 rounded-xl font-bold text-xl hover:from-amber-600 hover:to-yellow-600 transition shadow-2xl">
-                    <i class="fas fa-calendar-check mr-2"></i>
-                    Agendar Mi Demo Gratuita
-                </a>
-                <a href="calculadora-roi.html" class="bg-white/10 backdrop-blur-sm text-white px-12 py-5 rounded-xl font-bold text-xl hover:bg-white/20 transition border-2 border-white/30">
-                    <i class="fas fa-calculator mr-2"></i>
-                    Calcular Mi ROI
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer Simple -->
+    <!-- Footer -->
     <footer class="bg-slate-900 text-gray-400 py-8">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p>&copy; 2025 HELIOS AI LABS. Todos los derechos reservados.</p>
             <p class="mt-2">📞 +52 771 762 2360 | 📧 heliosailabs@gmail.com</p>
         </div>
     </footer>
+
+    <script>
+        // Inicializar la calculadora al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            calcularROI();
+        });
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function calcularROI() {
+            // Obtener valores de los inputs
+            const llamadasSemana = parseInt(document.getElementById('llamadas').value);
+            const porcentajePerdido = parseInt(document.getElementById('porcentaje').value);
+            const valorCliente = parseInt(document.getElementById('valor').value);
+            const tasaConversion = parseInt(document.getElementById('conversion').value);
+
+            // Actualizar displays de valores
+            document.getElementById('llamadas-value').textContent = llamadasSemana;
+            document.getElementById('porcentaje-value').textContent = porcentajePerdido;
+            document.getElementById('valor-value').textContent = formatNumber(valorCliente);
+            document.getElementById('conversion-value').textContent = tasaConversion;
+
+            // Cálculos
+            const llamadasMes = llamadasSemana * 4;
+            const llamadasPerdidas = Math.round(llamadasMes * (porcentajePerdido / 100));
+            const clientesPerdidos = Math.round(llamadasPerdidas * (tasaConversion / 100));
+            const perdidaMensual = clientesPerdidos * valorCliente;
+            const perdidaAnual = perdidaMensual * 12;
+
+            // Con IA (asumiendo 85% de efectividad en recuperación)
+            const clientesRecuperados = Math.round(clientesPerdidos * 0.85);
+            const gananciaMensual = clientesRecuperados * valorCliente;
+            const gananciaAnual = gananciaMensual * 12;
+
+            // Costo del servicio (ejemplo: $3,800/mes)
+            const costoServicio = 3800;
+            const gananciaNetaMensual = gananciaMensual - costoServicio;
+            const gananciaNetaAnual = gananciaNetaMensual * 12;
+
+            // ROI
+            const roiPorcentaje = Math.round((gananciaNetaMensual / costoServicio) * 100);
+            const roiMultiplicador = (gananciaNetaMensual / costoServicio + 1).toFixed(1);
+            const mesesRecuperacion = Math.max(1, Math.round(costoServicio / gananciaNetaMensual));
+
+            // Actualizar resultados en el DOM
+            document.getElementById('perdida-mensual').textContent = formatNumber(perdidaMensual);
+            document.getElementById('perdida-anual').textContent = formatNumber(perdidaAnual);
+            document.getElementById('ganancia-mensual').textContent = formatNumber(gananciaNetaMensual);
+            document.getElementById('ganancia-anual').textContent = formatNumber(gananciaNetaAnual);
+            document.getElementById('roi-porcentaje').textContent = formatNumber(roiPorcentaje);
+            document.getElementById('roi-multiplicador').textContent = roiMultiplicador;
+            document.getElementById('meses-recuperacion').textContent = mesesRecuperacion;
+            document.getElementById('llamadas-perdidas').textContent = formatNumber(llamadasPerdidas);
+            document.getElementById('clientes-perdidos').textContent = clientesPerdidos;
+            document.getElementById('clientes-recuperados').textContent = clientesRecuperados;
+        }
+    </script>
 
 </body>
 </html>
