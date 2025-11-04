@@ -21,6 +21,12 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
+        .back-button {
+            transition: all 0.3s ease;
+        }
+        .back-button:hover {
+            transform: translateX(-5px);
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-gray-100">
@@ -32,6 +38,10 @@
                 <img src="HeliosLogoBlackSun.png" alt="HELIOS AI LABS" class="h-12">
             </a>
             <div class="flex items-center space-x-4">
+                <!-- Botón de Regreso en el Header (Opción 1) -->
+                <a href="index.html" class="back-button text-gray-300 hover:text-amber-400 font-semibold hidden md:flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>Inicio
+                </a>
                 <a href="calculadora-roi.html" class="text-amber-400 hover:text-amber-300 font-semibold hidden md:block">
                     <i class="fas fa-calculator mr-2"></i>Calculadora ROI
                 </a>
@@ -41,6 +51,12 @@
             </div>
         </div>
     </div>
+
+    <!-- Botón Flotante de Regreso (Opción 2) -->
+    <a href="index.html" class="back-button fixed bottom-8 left-8 bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full shadow-2xl flex items-center space-x-2 z-40 font-semibold">
+        <i class="fas fa-arrow-left"></i>
+        <span>Volver al Inicio</span>
+    </a>
 
     <!-- Hero -->
     <section class="py-20 px-4">
