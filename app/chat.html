@@ -1,16 +1,37 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  title>Helios IA Chat</title>
+  <meta charset="utf-8" />
+  <title>Helios IA Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="chat-app">
+  <div id="chat-app" aria-live="polite">
     <div id="messages"></div>
+
+    <!-- Formulario modal para pedir datos cuando toca -->
+    <div id="contact-modal" class="hidden">
+      <div class="modal-inner">
+        <h3>Perfecto — Solo un detalle para agendar</h3>
+        <label>Nombre completo
+          <input id="modal-name" type="text" placeholder="Ej. Dra. Pérez">
+        </label>
+        <label>Teléfono (WhatsApp)
+          <input id="modal-phone" type="text" inputmode="tel" placeholder="+52 1...">
+        </label>
+        <label>Correo electrónico
+          <input id="modal-email" type="email" placeholder="correo@ejemplo.com">
+        </label>
+        <div class="modal-actions">
+          <button id="modal-cancel" class="option-btn">Cancelar</button>
+          <button id="modal-send" class="option-btn">Enviar y Agendar</button>
+        </div>
+      </div>
+    </div>
+
     <div id="input-area">
-      <input id="userInput" type="text" placeholder="Escribe aquí..." autocomplete="off">
+      <input id="userInput" type="text" placeholder="Si quieres, escribe algo..." autocomplete="off" />
       <button id="sendBtn">Enviar</button>
     </div>
   </div>
@@ -18,4 +39,3 @@
   <script src="chat.js"></script>
 </body>
 </html>
-
