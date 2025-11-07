@@ -1,1 +1,114 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Pantalla completa */
+body, html {
+  width: 100%;
+  height: 100%;
+  background: #0a0a0a;
+}
+
+/* Contenedor principal */
+#chat-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 900px;
+  margin: auto;
+  background: #111;
+  border-left: 2px solid #222;
+  border-right: 2px solid #222;
+}
+
+/* Área de mensajes */
+#messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Mensajes */
+.message {
+  max-width: 80%;
+  padding: 12px 15px;
+  border-radius: 14px;
+  line-height: 1.4em;
+  font-size: 15px;
+}
+
+/* Chatbot */
+.bot {
+  align-self: flex-start;
+  background: #2c2c3e;
+  color: #fff;
+}
+
+/* Usuario */
+.user {
+  align-self: flex-end;
+  background: #0084ff;
+  color: #fff;
+}
+
+/* Zona de entrada de texto */
+#input-area {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border-top: 2px solid #222;
+  background: #111;
+}
+
+#userInput {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: #222;
+  color: #fff;
+  font-size: 15px;
+}
+
+#userInput::placeholder {
+  color: #999;
+}
+
+#sendBtn {
+  background: #ffb400;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#sendBtn:hover {
+  background: #ff9900;
+}
+
+/* Botones tipo burbuja */
+.option-btn {
+  background: #333;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 20px;
+  border: 1px solid #555;
+  cursor: pointer;
+  display: inline-block;
+  margin: 4px 0;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.option-btn:hover {
+  background: #555;
+}
 
