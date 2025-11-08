@@ -550,11 +550,20 @@ function handleConsult() {
   addMessage("¿Desea que le enviemos una presentación por email o prefiere agendar una reunión con su decisor?");
   setTimeout(()=> {
     addOptions([
-      { label: "A) Enviar presentación (email)", value:"send_pres", next: ()=> offerPresentation() },
+      { label: "A) Enviar presentación (email)", value: "send_pres", next: ()=> askEmailForPresentation() },
       { label: "B) Agendar reunión con decisor", value:"agendar_decisor", next: ()=> openContactCapture() }
     ]);
   },300);
 }
+
+// función añadida según instrucción
+function askEmailForPresentation() {
+  addMessage("Por favor ingrese su email en el campo inferior y presione Enviar.");
+  state.step = "awaitEmailForPresentation";
+  inputField.disabled = false;
+  sendBtn.disabled = false;
+}
+
 
 /* ---------- FASE 8: captura de contacto ---------- */
 function openContactCapture() {
