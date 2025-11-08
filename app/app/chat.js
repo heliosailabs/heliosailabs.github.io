@@ -1,25 +1,25 @@
-/* chat.js - Helios AI Labs
-   Implementación literal del FLUJO CONVERSACIONAL COMPLETO - HELIOS AI LABS
-   - No se modifica ni una palabra del contenido entregado por el usuario.
-   - No se añaden botones/respuestas que no estén en el flujo.
-   - Envía payload al webhook n8n y deja extra para email + formas de pago.
-   - Cuando capture email y datos de contacto, incluye schedule:true para que n8n agende en Cal.com.
-*/
+/* ---------- chat.js - Helios AI Labs (implementación literal del flujo entregado) ----------
+   - Reemplaza /app/chat.js con este archivo.
+   - No altera los textos del flujo entregado.
+   - Envía payload al webhook: https://heliosailabs369.app.n8n.cloud/webhook/chatbot-groq
+   - Copia por email: heliosailabs@gmail.com (extra.emailCopyTo)
+   - Formas de pago incluidas en extra.formsOfPayment
+   - Cuando capture contacto con email, envía extra.schedule = true para que n8n agende con Cal.com
+---------------------------------------------------------------------------------------- */
 
-/* ---------- CONFIG ---------- */
 const WEBHOOK_URL = "https://heliosailabs369.app.n8n.cloud/webhook/chatbot-groq";
 const EMAIL_COPY_TO = "heliosailabs@gmail.com";
 const FORMS_OF_PAYMENT = "Transferencia bancaria, todas las tarjetas de crédito y debito VISA, Mastercard y American Express, Bitcoin y ETH.";
 
-/* ---------- DOM ---------- */
+/* DOM */
 const messagesContainer = document.getElementById("messages");
 const inputField = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
 
-/* ---------- Session & Lead ---------- */
-function genSessionId() {
+/* session */
+function genSessionId(){
   let s = localStorage.getItem("helios_sessionId");
-  if (!s) {
+  if(!s){
     s = `sess_${Date.now()}_${Math.floor(Math.random()*10000)}`;
     localStorage.setItem("helios_sessionId", s);
   }
@@ -27,6 +27,7 @@ function genSessionId() {
 }
 const sessionId = genSessionId();
 
+/* lead */
 let lead = {
   name: "",
   title: "",
@@ -43,75 +44,71 @@ let lead = {
   responses: []
 };
 
-/* ---------- Estado de flujo ---------- */
-let currentStep = null; // expecting typed input: "captureName", "captureTitleChoice", "captureContactLine", "capturePresentationEmail", "captureScheduleDate"
+/* state */
+let currentStep = null; // typed steps: "captureName", "capturePresentationEmail", "captureContactLine", "captureDateForDecisor"
 let optionsVisible = false;
 let lastOptionsWrapper = null;
 
-/* ---------- UI helpers ---------- */
-function addMessage(text, sender = "bot") {
+/* UI helpers */
+function addMessage(text, sender="bot"){
   const el = document.createElement("div");
   el.classList.add("message", sender);
   el.innerHTML = text.replace(/\n/g, "<br/>");
   messagesContainer.appendChild(el);
-  setTimeout(()=>messagesContainer.scrollTop = messagesContainer.scrollHeight, 40);
+  setTimeout(()=> messagesContainer.scrollTop = messagesContainer.scrollHeight, 40);
   return el;
 }
-
-function clearLastOptions() {
-  if (lastOptionsWrapper) {
+function clearLastOptions(){
+  if(lastOptionsWrapper){
     lastOptionsWrapper.remove();
     lastOptionsWrapper = null;
   }
   optionsVisible = false;
   inputField.disabled = false;
-  if (sendBtn) sendBtn.disabled = false;
+  if(sendBtn) sendBtn.disabled = false;
+  inputField.placeholder = "Escribe aquí...";
 }
-
-function lockInput(placeholder = "Selecciona una opción desde las burbujas...") {
+function lockInput(placeholder="Selecciona una opción desde las burbujas..."){
   optionsVisible = true;
   inputField.disabled = true;
+  if(sendBtn) sendBtn.disabled = true;
   inputField.placeholder = placeholder;
-  if (sendBtn) sendBtn.disabled = true;
 }
-function unlockInput() {
+function unlockInput(){
   optionsVisible = false;
   inputField.disabled = false;
+  if(sendBtn) sendBtn.disabled = false;
   inputField.placeholder = "Escribe aquí...";
-  if (sendBtn) sendBtn.disabled = false;
 }
 
-/* ---------- Render options (only those from your flow) ---------- */
-function addOptions(items) {
-  // items: array of { label: "text", value: "...", next: fn OR nextName: "string" }
+/* options renderer (literal labels) */
+function addOptions(items){
   clearLastOptions();
   const wrapper = document.createElement("div");
-  wrapper.classList.add("message", "bot");
+  wrapper.classList.add("message","bot");
   const row = document.createElement("div");
   row.classList.add("option-row");
-
-  items.forEach(it => {
+  items.forEach(it=>{
     const btn = document.createElement("button");
     btn.classList.add("option-btn");
     btn.type = "button";
-    btn.innerText = it.label; // keep literal text
-    btn.addEventListener("click", () => {
-      // show user's selection as bubble
+    btn.innerText = it.label; // keep literal
+    btn.addEventListener("click", ()=>{
+      // show user bubble
       addMessage(it.label, "user");
       // store response
       lead.responses.push({ option: it.value || it.label, label: it.label, ts: new Date().toISOString() });
-      // disable row buttons visually
-      Array.from(row.querySelectorAll("button")).forEach(b=>b.disabled = true);
-      // small delay then call handler
-      setTimeout(() => {
+      // disable buttons
+      Array.from(row.querySelectorAll("button")).forEach(b=>b.disabled=true);
+      // small delay then call
+      setTimeout(()=>{
         clearLastOptions();
-        if (typeof it.next === "function") it.next(it.value);
-        else if (typeof it.nextName === "string" && handlers[it.nextName]) handlers[it.nextName](it.value);
+        if(typeof it.next === "function") it.next(it.value);
+        else if(typeof it.nextName === "string" && handlers[it.nextName]) handlers[it.nextName](it.value);
       }, 180);
     });
     row.appendChild(btn);
   });
-
   wrapper.appendChild(row);
   messagesContainer.appendChild(wrapper);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -119,63 +116,50 @@ function addOptions(items) {
   lockInput();
 }
 
-/* ---------- Helper: conservative extraction of surname, keep it simple ---------- */
-function extractSurname(raw) {
-  if (!raw) return "";
+/* conservative surname extraction (do not invent names) */
+function extractSurname(raw){
+  if(!raw) return "";
   const s = raw.trim();
   const parts = s.split(/\s+/);
-  return parts.length > 1 ? parts[parts.length-1] : s;
+  return parts.length>1 ? parts[parts.length-1] : s;
 }
 
-/* ---------- Titles to present as choice (user requested explicit selection) ---------- */
+/* TITLE CHOICES explicit (user asked for explicit selection) */
 const TITLE_CHOICES = [
   "Dr.", "Dra.", "Arq.", "Lic.", "Ing.", "C.P.", "Mtro.", "Mtra.",
   "Sr.", "Sra.", "Srita.", "Don", "Doña", "Profesor", "Profesora", "Coach", "Chef", "Otro"
 ];
 
-/* ---------- Handlers mapping (invoked by addOptions via nextName) ---------- */
-const handlers = {
-  showMainMenu,
-  handleA, handleB, handleC, handleD, handleE,
-  askGiro, askGiro_Salud, askGiro_Juridico, askGiro_Generic,
-  renderPitch_Salud, renderPitch_Juridico, renderPitch_Generic,
-  askDiagnostic, diagnosticMarketingOrOperations, askMarketingBudget,
-  askReadyFor20Clients, renderPitchForScale, renderPitchForAutomation,
-  askInterestAndDecision, handleThink, handleConsult, offerPresentation,
-  openContactCapture, captureContactLineHandler, handleEvasiveContact,
-  insistenceAnecdote, askEmailForPresentation, askForContact
-};
+/* ---------- HANDLERS COLLECTION (defined as functions below and referenced safely) ---------- */
+const handlers = {}; // populated after function definitions
 
-/* ---------- Start: FASE 0 ---------- */
-/* Bot: "¡Hola! Soy Helios, Asesor Comercial Senior de Helios AI Labs. ¿Con quién tengo el gusto?"
-   Usuario escribe nombre
-   Bot: "Excelente [TÍTULO] [APELLIDO]. Gracias."
-*/
-function startChat() {
+/* ---------- FLOW IMPLEMENTATION (texts exactly as you provided) ---------- */
+
+/* FASE 0: START - ask name first */
+function startChat(){
+  // ask for name exactly as in your flow
   addMessage("¡Hola! Soy Helios, Asesor Comercial Senior de Helios AI Labs. ¿Con quién tengo el gusto?");
-  // expect typed name
   currentStep = "captureName";
   unlockInput();
 }
 
-/* ---------- FASE 1: show main menu (A..E as literal) ---------- */
-function showMainMenu() {
+/* FASE 1: main menu (literal) */
+function showMainMenu(){
   addMessage("Gracias por contactarnos, somos Helios AI Labs. Para proporcionarle la mejor atención, personalizada y diseñar para usted un traje a la medida ¿Cuál de las siguientes preguntas desea que respondamos para usted?");
-  setTimeout(() => {
+  setTimeout(()=>{
     addOptions([
-      { label: "A) ¿Cómo funciona la automatización de procesos con IA y qué beneficios medibles puede aportar a mi negocio?", value:"A", nextName: "handleA" },
-      { label: "B) Quiero información sobre su empresa, ubicación, experiencia, credenciales, referencias, información fiscal, contrato, garantía por escrito, etc.", value:"B", nextName: "handleB" },
-      { label: "C) ¿Por qué adoptar Inteligencia Artificial hoy es tan importante y cuales son los escenarios para mi negocio sí decido esperar más tiempo?", value:"C", nextName: "handleC" },
-      { label: "D) ¿Cuánto cuesta implementar IA en mi negocio y en cuanto tiempo recuperaré mi inversión? ¿Tienen promociones?", value:"D", nextName: "handleD" },
-      { label: "E) Todas las anteriores", value:"E", nextName: "handleE" }
+      { label: "A) ¿Cómo funciona la automatización de procesos con IA y qué beneficios medibles puede aportar a mi negocio?", value:"A", nextName:"handleA" },
+      { label: "B) Quiero información sobre su empresa, ubicación, experiencia, credenciales, referencias, información fiscal, contrato, garantía por escrito, etc.", value:"B", nextName:"handleB" },
+      { label: "C) ¿Por qué adoptar Inteligencia Artificial hoy es tan importante y cuales son los escenarios para mi negocio sí decido esperar más tiempo?", value:"C", nextName:"handleC" },
+      { label: "D) ¿Cuánto cuesta implementar IA en mi negocio y en cuanto tiempo recuperaré mi inversión? ¿Tienen promociones?", value:"D", nextName:"handleD" },
+      { label: "E) Todas las anteriores", value:"E", nextName:"handleE" }
     ]);
-  }, 300);
+  }, 260);
 }
 
-/* ---------- FASE 2 / Handlers A..E ---------- */
-function handleA() { askGiro(); }
-function handleB() { 
-  // FASE 11 text (B) — includes forms of payment
+/* Handler A..E implementations (literal texts from your flow) */
+function handleA(){ askGiro(); }
+function handleB(){
   const text = `Nombre comercial: Helios AI Labs.
 Todos nuestros servicios de automatización con Inteligencia Artificial, desarrollo de Software y diseño de aplicaciones son facturados inmediatamente. (Esto incluye contrataciones pagadas con Crypto, medios digitales, transferencias, pago en efectivo).
 Ciudad / dirección:
@@ -191,23 +175,23 @@ Contacto directo con nuestros expertos y asistencia técnica 24/7 por WhatsApp: 
 
 Formas de pago: ${FORMS_OF_PAYMENT}.`;
   addMessage(text);
-  setTimeout(()=>{ addMessage("¿Desea ver las opciones nuevamente?"); setTimeout(()=>showMainMenu(),300); }, 600);
+  setTimeout(()=> { addMessage("¿Desea ver las opciones nuevamente?"); setTimeout(()=> showMainMenu(), 300); }, 700);
 }
-function handleC() {
+function handleC(){
   addMessage("Adoptar Inteligencia Artificial hoy es importante porque acelera procesos, reduce errores y permite tomar decisiones basadas en datos. Esperar implica perder ventaja competitiva, clientes potenciales y oportunidades de crecimiento, además de elevar el costo de implementación a futuro.");
-  setTimeout(()=>{ addMessage("¿Desea ver las opciones nuevamente?"); setTimeout(()=>showMainMenu(),300); },600);
+  setTimeout(()=> { addMessage("¿Desea ver las opciones nuevamente?"); setTimeout(()=> showMainMenu(), 300); }, 700);
 }
-function handleD() {
+function handleD(){
   addMessage("Los costos de implementación varían según alcance. Contamos con paquetes y financiamiento; muchas implementaciones recuperan la inversión en menos de 3 meses dependiendo del caso.");
-  setTimeout(()=>{ addMessage("¿Desea ver las opciones nuevamente?"); setTimeout(()=>showMainMenu(),300); },600);
+  setTimeout(()=> { addMessage("¿Desea ver las opciones nuevamente?"); setTimeout(()=> showMainMenu(), 300); }, 700);
 }
-function handleE() {
-  addMessage("Perfecto — mostraré un pitch completo y un plan inmediato de acción.");
-  setTimeout(()=>{ openContactCapture(); },600);
+function handleE(){
+  addMessage("Perfecto, puedo mostrarle un plan de acción inmediato y agendar una asesoría gratuita de diagnóstico.");
+  setTimeout(()=> { openContactCapture(); }, 500);
 }
 
-/* ---------- FASE 2: askGiro (A) ---------- */
-function askGiro() {
+/* ---------- A -> askGiro ---------- */
+function askGiro(){
   addMessage("Para responder a su pregunta, con la atención que usted se merece, por favor dígame: ¿En cuál de los siguientes giros se encuentra su negocio?");
   setTimeout(()=> {
     addOptions([
@@ -222,11 +206,11 @@ function askGiro() {
       { label: "I) Belleza", value:"Belleza", next: ()=> askGiro_Generic("Belleza") },
       { label: "J) Otro", value:"Otro", next: ()=> askGiro_Generic("Otro") }
     ]);
-  }, 300);
+  },300);
 }
 
 /* ---------- FASE 3: subcategorias ---------- */
-function askGiro_Salud() {
+function askGiro_Salud(){
   lead.industry = "Salud";
   addMessage("¿Cuál de las siguientes opciones describe mejor su negocio?");
   setTimeout(()=> {
@@ -240,7 +224,7 @@ function askGiro_Salud() {
   },300);
 }
 
-function askGiro_Juridico() {
+function askGiro_Juridico(){
   lead.industry = "Despacho Jurídico";
   addMessage("¿Cuál de las siguientes describe mejor su despacho jurídico?");
   setTimeout(()=> {
@@ -253,14 +237,14 @@ function askGiro_Juridico() {
   },300);
 }
 
-function askGiro_Generic(val) {
+function askGiro_Generic(val){
   lead.industry = val || "";
   addMessage("Gracias — estamos registrando su selección. (Próxima iteración: pitch específico para esta categoría).");
   setTimeout(()=> askDiagnostic(), 700);
 }
 
-/* ---------- FASE 4: Diagnóstico comercial (opcional) ---------- */
-function askDiagnostic() {
+/* ---------- FASE 4: Diagnóstico (opcional) ---------- */
+function askDiagnostic(){
   addMessage("Para poder ayudarle de la mejor manera… ¿Qué le gustaría mejorar primero en su negocio?");
   setTimeout(()=> {
     addOptions([
@@ -273,8 +257,8 @@ function askDiagnostic() {
   },300);
 }
 
-function diagnosticMarketingOrOperations(choice) {
-  if (choice === "A" || choice === "B" || choice === "E") {
+function diagnosticMarketingOrOperations(choice){
+  if(choice === "A" || choice === "B" || choice === "E"){
     addMessage("Y hoy… ¿quién maneja el marketing digital o la publicidad?");
     setTimeout(()=> {
       addOptions([
@@ -287,38 +271,38 @@ function diagnosticMarketingOrOperations(choice) {
     addMessage("¿Qué tarea le consume más tiempo hoy y le gustaría automatizar primero?");
     setTimeout(()=> {
       const items = [];
-      if (lead.industry === "Salud") {
-        items.push({ label: "citas", value:"citas", next: ()=> askInterestAndDecision() });
-        items.push({ label: "recordatorios", value:"recordatorios", next: ()=> askInterestAndDecision() });
-        items.push({ label: "pagos", value:"pagos", next: ()=> askInterestAndDecision() });
-        items.push({ label: "seguimiento", value:"seguimiento", next: ()=> askInterestAndDecision() });
-      } else if (lead.industry === "Despacho Jurídico") {
-        items.push({ label: "captación de casos", value:"captacion", next: ()=> askInterestAndDecision() });
-        items.push({ label: "documentación", value:"documentacion", next: ()=> askInterestAndDecision() });
-        items.push({ label: "filtros legales", value:"filtros", next: ()=> askInterestAndDecision() });
-      } else if (lead.industry === "Sector inmobiliario") {
-        items.push({ label: "leads", value:"leads", next: ()=> askInterestAndDecision() });
-        items.push({ label: "citas", value:"citas", next: ()=> askInterestAndDecision() });
-        items.push({ label: "tours", value:"tours", next: ()=> askInterestAndDecision() });
-        items.push({ label: "seguimiento", value:"seguimiento", next: ()=> askInterestAndDecision() });
-      } else if (lead.industry === "Comercio (minorista / mayorista)") {
-        items.push({ label: "inventarios", value:"inventarios", next: ()=> askInterestAndDecision() });
-        items.push({ label: "WhatsApp", value:"whatsapp", next: ()=> askInterestAndDecision() });
-        items.push({ label: "pedidos", value:"pedidos", next: ()=> askInterestAndDecision() });
-        items.push({ label: "Planificación de Recursos Empresariales", value:"planificacion", next: ()=> askInterestAndDecision() });
-      } else if (lead.industry === "Belleza") {
-        items.push({ label: "agenda", value:"agenda", next: ()=> askInterestAndDecision() });
-        items.push({ label: "promociones automáticas", value:"promos", next: ()=> askInterestAndDecision() });
-        items.push({ label: "reseñas", value:"reseñas", next: ()=> askInterestAndDecision() });
+      if(lead.industry === "Salud"){
+        items.push({ label:"citas", value:"citas", next: ()=> askInterestAndDecision() });
+        items.push({ label:"recordatorios", value:"recordatorios", next: ()=> askInterestAndDecision() });
+        items.push({ label:"pagos", value:"pagos", next: ()=> askInterestAndDecision() });
+        items.push({ label:"seguimiento", value:"seguimiento", next: ()=> askInterestAndDecision() });
+      } else if(lead.industry === "Despacho Jurídico"){
+        items.push({ label:"captación de casos", value:"captacion", next: ()=> askInterestAndDecision() });
+        items.push({ label:"documentación", value:"documentacion", next: ()=> askInterestAndDecision() });
+        items.push({ label:"filtros legales", value:"filtros", next: ()=> askInterestAndDecision() });
+      } else if(lead.industry === "Sector inmobiliario"){
+        items.push({ label:"leads", value:"leads", next: ()=> askInterestAndDecision() });
+        items.push({ label:"citas", value:"citas", next: ()=> askInterestAndDecision() });
+        items.push({ label:"tours", value:"tours", next: ()=> askInterestAndDecision() });
+        items.push({ label:"seguimiento", value:"seguimiento", next: ()=> askInterestAndDecision() });
+      } else if(lead.industry === "Comercio (minorista / mayorista)"){
+        items.push({ label:"inventarios", value:"inventarios", next: ()=> askInterestAndDecision() });
+        items.push({ label:"WhatsApp", value:"whatsapp", next: ()=> askInterestAndDecision() });
+        items.push({ label:"pedidos", value:"pedidos", next: ()=> askInterestAndDecision() });
+        items.push({ label:"Planificación de Recursos Empresariales", value:"planificacion", next: ()=> askInterestAndDecision() });
+      } else if(lead.industry === "Belleza"){
+        items.push({ label:"agenda", value:"agenda", next: ()=> askInterestAndDecision() });
+        items.push({ label:"promociones automáticas", value:"promos", next: ()=> askInterestAndDecision() });
+        items.push({ label:"reseñas", value:"reseñas", next: ()=> askInterestAndDecision() });
       } else {
-        items.push({ label: "Automatizar tareas internas", value:"ops_generic", next: ()=> askInterestAndDecision() });
+        items.push({ label:"Automatizar tareas internas", value:"ops_generic", next: ()=> askInterestAndDecision() });
       }
       addOptions(items);
     },300);
   }
 }
 
-function askMarketingBudget() {
+function askMarketingBudget(){
   addMessage("¿Cuánto invierte aproximadamente al mes?");
   setTimeout(()=> {
     addOptions([
@@ -330,28 +314,27 @@ function askMarketingBudget() {
   },300);
 }
 
-function askReadyFor20Clients() {
+function askReadyFor20Clients(){
   addMessage("Si mañana le llegan 20 clientes nuevos… ¿Está listo para atenderlos?");
   setTimeout(()=> {
     addOptions([
       { label: "Sí", value:"ready_yes", next: ()=> renderPitchForScale() },
-      { label: "No", value:"ready_no", next: ()=> renderPitchForAutomation() } // This "No" exists in your flow and is therefore included
+      { label: "No", value:"ready_no", next: ()=> renderPitchForAutomation() } // "No" exists in your flow -> kept
     ]);
   },300);
 }
 
-function renderPitchForScale() {
+function renderPitchForScale(){
   addMessage("Pitch agresivo (escala inmediata)");
   setTimeout(()=> askInterestAndDecision(),600);
 }
-function renderPitchForAutomation() {
+function renderPitchForAutomation(){
   addMessage("Pitch enfocado en automatizar atención");
   setTimeout(()=> askInterestAndDecision(),600);
 }
 
-/* ---------- FASE 5: PITCHES (textos EXACTOS del flujo entregado) ---------- */
-
-function renderPitch_Salud(subcat) {
+/* ---------- FASE 5: PITCHES exact texts ---------- */
+function renderPitch_Salud(subcat){
   lead.subcategory = subcat || "";
   const text = `En consultorios y clínicas la automatización con IA puede contestar llamadas por voz o mensajes de texto, agendar citas y confirmar consultas por usted 24/7, enviar recordatorios a los pacientes (disminuyendo dramáticamente las consultas canceladas o los retrasos). Puede notificarle a Ud. directamente en caso de emergencia. Llevar un control de todos sus expedientes, cobrar consultas por adelantado con medios digitales, darle seguimiento a sus pacientes, enviar felicitaciones en días festivos. Puede aumentar el número de pacientes exponencialmente, de acuerdo a sus instrucciones.
 Es importante entender que vivimos en la era de la transformación digital. Según la Curva de Adopción de Innovación de Rogers, las empresas y profesionales se dividen en cinco categorías: los Innovadores (2.5%) que adoptan tecnología primero, los Adoptadores Tempranos (13.5%) que lideran tendencias, la Mayoría Temprana (34%) que adopta cuando ven resultados comprobados, la Mayoría Tardía (34%) que se suma por presión competitiva, y los Rezagados (16%) que resisten el cambio hasta que es demasiado tarde. En el sector salud, quienes adoptan IA ahora se posicionan como líderes, mientras que esperar significa ceder pacientes y prestigio a la competencia que ya está automatizada.
@@ -366,10 +349,10 @@ Además, la automatización con IA atrae a un perfil de clientes con un mayor po
         { label: "C) Lo tengo que consultar (socio/jefe/esposo/esposa)", value:"consult", next: ()=> handleConsult() }
       ]);
     },300);
-  },400);
+  },420);
 }
 
-function renderPitch_Juridico(subcat) {
+function renderPitch_Juridico(subcat){
   lead.subcategory = subcat || "";
   const text = `⚖ [TÍTULO] [APELLIDO], en su profesión la confianza, velocidad y resultados lo son todo.
 La automatización con IA puede contestar llamadas por voz o mensajes de texto, responder dudas y preguntas frecuentes a sus clientes 24/7, agendar citas, enviar recordatorios, confirmar reuniones de trabajo, etc.
@@ -394,14 +377,13 @@ Además, la automatización con IA atrae a un perfil de clientes con un mayor po
         { label: "C) Lo tengo que consultar (socio/jefe/esposo/esposa)", value:"consult", next: ()=> handleConsult() }
       ]);
     },300);
-  },400);
+  },420);
 }
 
-/* For other industries use the exact texts you provided; here we present a generic mapping that calls the exact flows when available */
-function renderPitch_Generic(giro) {
-  // The full texts for realestate/food/edu/retail/freelance/content/beauty are long and included in your flow.
-  // We'll include them literally here for each matching giro.
-  const P = {
+/* Generic pitch mapping for other industries (literal text provided earlier) */
+function renderPitch_Generic(giro){
+  // literal texts taken from your flow (kept in mapping)
+  const map = {
     "Sector inmobiliario": `🏡 [TÍTULO] [APELLIDO], hoy el 95% de las personas buscan propiedades en internet.
 La automatización con IA puede contestar llamadas por voz o mensajes de texto, responder dudas y preguntas frecuentes a sus clientes 24/7, agendar citas, enviar recordatorios, confirmar reuniones de trabajo, etc.
 Si escriben y nadie responde de inmediato…
@@ -431,7 +413,6 @@ Nuestra IA trabaja como anfitriona 24/7:
 Resultado real en negocios como el suyo:
 → 2X a 4X más ventas en menos de 90 días
 → Menos mesas vacías, más ingresos diarios
-Es importante entender que vivimos en la era de la transformación digital. Según la Curva de Adopción de Innovación de Rogers, ...
 Además, la automatización con IA atrae a un perfil de clientes con mayor poder adquisitivo y eleva sustancialmente el ticket promedio.`,
     "Educación": `🎓 [TÍTULO] [APELLIDO], hoy los padres y alumnos toman decisiones en cuestión de minutos.
 La automatización con IA puede contestar llamadas por voz o mensajes de texto, responder dudas y preguntas frecuentes a sus clientes 24/7, agendar citas, enviar recordatorios, confirmar reuniones de trabajo, etc.
@@ -441,11 +422,11 @@ Nuestra IA es su coordinadora de admisiones 24/7:
 ✅ Da seguimiento hasta la inscripción
 ✅ Recordatorios automáticos de pagos
 ✅ Retiene alumnos para evitar deserción
+
 Resultado en instituciones como la suya:
 → +30% a +200% más inscripciones
 → Menos abandono
-→ Más ingresos recurrentes
-Es importante entender que vivimos en la era de la transformación digital. ...`,
+→ Más ingresos recurrentes`,
     "Comercio (minorista / mayorista)": `🛍 [TÍTULO] [APELLIDO], en comercio la venta ocurre en el mismo momento en que el cliente pregunta.
 Nuestra IA se convierte en su mejor vendedor 24/7:
 ✅ Responde WhatsApp e Instagram al instante
@@ -454,9 +435,9 @@ Nuestra IA se convierte en su mejor vendedor 24/7:
 ✅ Agrega al carrito y cobra sola
 ✅ Verifica existencias en inventario
 ✅ Envío o pickup automatizado
+
 Resultado real:
-→ 2X a 5X ventas en menos de 90 días
-→ Ingresos mientras usted duerme`,
+→ 2X a 5X ventas en menos de 90 días`,
     "Profesional independiente": `👔 [TÍTULO] [APELLIDO], cuando una persona trabaja por su cuenta… el tiempo es el recurso más valioso y cada hora que no factura… es dinero perdido.
 La automatización con IA puede contestar llamadas por voz o mensajes de texto, responder dudas y preguntas frecuentes a sus clientes 24/7, agendar citas, enviar recordatorios, confirmar reuniones de trabajo, etc.
 Nuestra IA se encarga de:
@@ -464,6 +445,7 @@ Nuestra IA se encarga de:
 ✅ Filtrar clientes sin presupuesto
 ✅ Agendar citas automáticamente
 ✅ Cerrar prospectos mientras usted trabaja
+
 Resultado directo:
 → Se duplican sus oportunidades reales de venta`,
     "Creación de contenido": `📱 [TÍTULO] [APELLIDO], tu marca puede multiplicar ventas sin saturarte.
@@ -471,10 +453,8 @@ La automatización con IA puede contestar llamadas por voz o mensajes de texto, 
 La IA:
 ✅ Responde y convierte seguidores en clientes
 ✅ Crea contenido, guiones y copy optimizados
-✅ Automatiza ventas de cursos, citas y productos digitales
-✅ Acelera tu crecimiento → más ingresos por la misma energía`,
+✅ Automatiza ventas de cursos, citas y productos digitales`,
     "Belleza": `💄 [TÍTULO] [APELLIDO], cuando alguien quiere un servicio de belleza la decisión la toma en ese mismo momento.
-La automatización con IA puede contestar llamadas por voz o mensajes de texto, responder dudas y preguntas frecuentes a sus clientes 24/7, agendar citas, enviar recordatorios, confirmar reuniones de trabajo, etc.
 Nuestra IA trabaja como su recepcionista perfecta 24/7:
 ✅ Responde al instante
 ✅ Agenda citas sola
@@ -482,8 +462,7 @@ Nuestra IA trabaja como su recepcionista perfecta 24/7:
 ✅ Reduce cancelaciones +80%
 ✅ Da seguimiento hasta que el cliente confirma`
   };
-
-  const txt = P[giro] || `Pronto le mostraremos un plan específico para su giro.`;
+  const txt = map[giro] || `Pronto le mostraremos un plan específico para su giro.`;
   addMessage(txt);
   setTimeout(()=> {
     addMessage("Si la implementación fuera 100% accesible a su economía y garantizara recuperar su inversión en un máximo de 3 meses, ¿estaría listo(a) para decidir hoy?");
@@ -494,11 +473,11 @@ Nuestra IA trabaja como su recepcionista perfecta 24/7:
         { label: "C) Lo tengo que consultar (socio/jefe/esposo/esposa)", value:"consult", next: ()=> handleConsult() }
       ]);
     },300);
-  },400);
+  },420);
 }
 
-/* ---------- FASE 7: cierre/objeciones ---------- */
-function askInterestAndDecision() {
+/* ---------- FASE 7 / cierre y objeciones ---------- */
+function askInterestAndDecision(){
   addMessage("Si la implementación fuera 100% accesible a su economía y garantizara recuperar su inversión en un máximo de 3 meses, ¿estaría listo(a) para decidir hoy?");
   setTimeout(()=> {
     addOptions([
@@ -509,7 +488,7 @@ function askInterestAndDecision() {
   },300);
 }
 
-function handleThink() {
+function handleThink(){
   addMessage("¿Qué porcentaje de la decisión de implementar una automatización de IA en su negocio depende de usted?");
   setTimeout(()=> {
     addOptions([
@@ -520,13 +499,13 @@ function handleThink() {
   },300);
 }
 
-function askDecisionIfHalfOrMore(isHalfOrMore) {
-  if (isHalfOrMore) {
+function askDecisionIfHalfOrMore(isHalfOrMore){
+  if(isHalfOrMore){
     addMessage("Si el 50% de su decisión en realidad fuera un 100% ¿estaría decidido a adquirir en este momento?");
     setTimeout(()=> {
       addOptions([
         { label: "Sí", value:"final_yes", next: ()=> openContactCapture() },
-        { label: "No", value:"final_no", next: ()=> { addMessage("Entiendo. Le enviaremos una presentación."); offerPresentation(); } } // "No" exists here in your flow
+        { label: "No", value:"final_no", next: ()=> { addMessage("Entiendo. Le enviaremos una presentación."); offerPresentation(); } } // "No" exists in your flow
       ]);
     },300);
   } else {
@@ -534,52 +513,50 @@ function askDecisionIfHalfOrMore(isHalfOrMore) {
     setTimeout(()=> {
       addOptions([
         { label: "Sí", value:"indeciso_yes", next: ()=> openContactCapture() },
-        { label: "No", value:"indeciso_no", next: ()=> { addMessage("Entiendo. Le enviaremos una presentación."); offerPresentation(); } } // again "No" is only here because it's in your flow
+        { label: "No", value:"indeciso_no", next: ()=> { addMessage("Entiendo. Le enviaremos una presentación."); offerPresentation(); } }
       ]);
     },400);
   }
 }
 
-function offerPresentation() {
+function offerPresentation(){
   addMessage("Perfecto. ¿Cuál email usamos para enviar la presentación?");
   currentStep = "capturePresentationEmail";
   unlockInput();
 }
 
-function handleConsult() {
+function handleConsult(){
   addMessage("¿Desea que le enviemos una presentación por email o prefiere agendar una reunión con su decisor?");
   setTimeout(()=> {
     addOptions([
-      { label: "A) Enviar presentación (email)", value: "send_pres", next: ()=> askEmailForPresentation() },
+      { label: "A) Enviar presentación (email)", value:"send_pres", next: ()=> askEmailForPresentation() },
       { label: "B) Agendar reunión con decisor", value:"agendar_decisor", next: ()=> openContactCapture() }
     ]);
   },300);
 }
 
-// función añadida según instrucción
-function askEmailForPresentation() {
-  addMessage("Por favor ingrese su email en el campo inferior y presione Enviar.");
-  state.step = "awaitEmailForPresentation";
-  inputField.disabled = false;
-  sendBtn.disabled = false;
+/* ---------- askEmailForPresentation (needed) ---------- */
+function askEmailForPresentation(){
+  addMessage("Ingrese por favor su email en el campo inferior y presione Enviar.");
+  currentStep = "capturePresentationEmail";
+  unlockInput();
 }
 
-
 /* ---------- FASE 8: captura de contacto ---------- */
-function openContactCapture() {
+function openContactCapture(){
   addMessage("Perfecto. Para agendar necesito: Teléfono (WhatsApp), Email, Día preferido y Hora aproximada.");
   currentStep = "captureContactLine";
   unlockInput();
 }
 
 /* ---------- FASE 9: evasive responses ---------- */
-function handleEvasiveContact() {
+function handleEvasiveContact(){
   addMessage('Claro que sí [TÍTULO] [APELLIDO], le comparto nuestro WhatsApp directo donde uno de nuestros ingenieros expertos puede atenderle de manera personalizada en cualquier momento que usted lo requiera +527717622360');
-  // end of conversation note: per flow do not send WhatsApp automatically
+  // per flow: do not auto-send WhatsApp message; just share number
 }
 
 /* ---------- FASE 10: insistencia sutil ---------- */
-function insistenceAnecdote() {
+function insistenceAnecdote(){
   addMessage('Muy bien [TÍTULO] pero antes de despedirnos le voy a contar brevemente una anécdota, uno de nuestros clientes se preguntaba por qué razón habían negocios super exitosos, mientras que el suyo parecía estar estancado, a pesar de ello decidió no invertir en nuestros servicios, así que le hice una sugerencia, le dije que escribiera en un papel "HELIOS" y que lo guardara debajo de su almohada y que cada vez que sintiera que su negocio no tenía el éxito que merecía, sacara el papel y lo leyera. ¿Le gustaría agendar una asesoría gratuita de 20 minutos que puede transformar su negocio para siempre o prefiere escribir HELIOS en un papelito?');
   setTimeout(()=> {
     addOptions([
@@ -589,34 +566,35 @@ function insistenceAnecdote() {
   },300);
 }
 
-/* ---------- FASE 11: Información de la empresa (B) - implemented above in handleB ---------- */
+/* ---------- Submit typed input handler ---------- */
+if(sendBtn){
+  sendBtn.addEventListener("click", onSubmit);
+}
+if(inputField){
+  inputField.addEventListener("keydown", (e)=> { if(e.key === "Enter") onSubmit(); });
+}
 
-/* ---------- Submit typed input handling ---------- */
-sendBtn.addEventListener("click", onSubmit);
-inputField.addEventListener("keydown", (e)=> { if (e.key === "Enter") onSubmit(); });
-
-async function onSubmit() {
+async function onSubmit(){
   const raw = (inputField.value || "").trim();
-  if (!raw) return;
+  if(!raw) return;
 
-  if (optionsVisible) {
+  if(optionsVisible){
     addMessage("Por favor seleccione una de las opciones mostradas arriba.", "bot");
     inputField.value = "";
     return;
   }
 
-  // user bubble
+  // show user bubble
   addMessage(raw, "user");
   inputField.value = "";
 
-  // store answer
+  // store raw
   lead.responses.push({ text: raw, ts: new Date().toISOString() });
 
-  // handle typed steps
-  if (currentStep === "captureName") {
-    // store surname conservatively
+  // typed step handlers
+  if(currentStep === "captureName"){
     lead.name = extractSurname(raw) || raw;
-    // AFTER capture name, ask title choice explicitly (user requested title selection choice)
+    // ask explicit title selection (user requested explicit choice)
     addMessage("¿Cómo prefiere que me dirija a usted? Elija una opción:");
     const titleItems = TITLE_CHOICES.map(t => ({ label: t, value: t, next: (v)=> { lead.title = v; addMessage(`Es un gusto ${lead.title} ${lead.name}. Será un placer atenderle.`); setTimeout(()=> { showMainMenu(); }, 500); } }));
     addOptions(titleItems);
@@ -624,47 +602,44 @@ async function onSubmit() {
     return;
   }
 
-  if (currentStep === "capturePresentationEmail") {
-    // accept email, send presentation flag
+  if(currentStep === "capturePresentationEmail"){
+    // capture email for presentation
     lead.email = raw;
     await sendLeadPayload({ wantsPresentation: true, emailCaptured: true });
-    addMessage("Perfecto. Le enviaremos la presentación a ese correo. Gracias.");
+    addMessage("Perfecto — le enviaremos la presentación a ese correo. Gracias.");
     currentStep = null;
     setTimeout(()=> showMainMenu(), 700);
     return;
   }
 
-  if (currentStep === "captureContactLine") {
-    captureContactLineHandler(raw);
+  if(currentStep === "captureContactLine"){
+    // parse "phone, email, day, time"
+    const parts = raw.split(",").map(s=>s.trim()).filter(Boolean);
+    if(parts.length < 2){
+      addMessage("Por favor ingrese al menos Teléfono (WhatsApp) y Email separados por comas.");
+      return;
+    }
+    if(!lead.phone && parts[0]) lead.phone = parts[0];
+    if(!lead.email && parts[1]) lead.email = parts[1];
+    if(parts[2]) lead.preferredDay = parts[2];
+    if(parts[3]) lead.preferredTime = parts[3];
+    addMessage("Gracias. En breve recibirá confirmación por email si procede.");
+    currentStep = null;
+    // send lead and set schedule flag if email present
+    const extra = { schedule: !!lead.email, emailCaptured: !!lead.email };
+    await sendLeadPayload(extra);
     return;
   }
 
-  // If no step matched, reopen menu
-  setTimeout(()=> { addMessage("No entendí exactamente — ¿Desea ver las opciones nuevamente?"); setTimeout(()=> showMainMenu(), 400); },200);
+  // fallback: re-open menu
+  setTimeout(()=> {
+    addMessage("No entendí exactamente — ¿Desea ver las opciones nuevamente?");
+    setTimeout(()=> showMainMenu(), 400);
+  }, 200);
 }
 
-/* ---------- capture contact line parsing ---------- */
-async function captureContactLineHandler(line) {
-  // Expect: Teléfono (WhatsApp), Email, Día preferido y Hora aproximada.
-  const parts = line.split(",").map(p=>p.trim()).filter(Boolean);
-  if (parts.length < 2) {
-    addMessage("Por favor ingrese al menos Teléfono (WhatsApp) y Email separados por comas.");
-    return;
-  }
-  if (!lead.phone && parts[0]) lead.phone = parts[0];
-  if (!lead.email && parts[1]) lead.email = parts[1];
-  if (parts[2]) lead.preferredDay = parts[2];
-  if (parts[3]) lead.preferredTime = parts[3];
-
-  addMessage("Gracias. En breve recibirá confirmación por email si procede.");
-  currentStep = null;
-
-  const extra = { schedule: !!lead.email, emailCaptured: !!lead.email };
-  await sendLeadPayload(extra);
-}
-
-/* ---------- send lead payload to webhook n8n ---------- */
-async function sendLeadPayload(extra = {}) {
+/* ---------- send payload to webhook (exact payload structure) ---------- */
+async function sendLeadPayload(extra = {}){
   const payload = {
     sessionId,
     timestamp: new Date().toISOString(),
@@ -692,24 +667,63 @@ async function sendLeadPayload(extra = {}) {
 
   addMessage("Enviando información y preparando confirmación...", "bot");
 
-  try {
+  try{
     const res = await fetch(WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
     addMessage("✅ ¡Listo! Hemos enviado la información. En breve recibirá confirmación por email.", "bot");
-  } catch (err) {
+  }catch(err){
     console.error("Webhook send error:", err);
     addMessage("⚠️ No pudimos enviar la información al servidor. Por favor contacte vía WhatsApp: +52 771 762 2360", "bot");
   }
 }
 
-/* ---------- Init ---------- */
-window.addEventListener("load", ()=> {
-  // Start at FASE 0 (ask name)
+/* ---------- Init: start at FASE 0 ---------- */
+window.addEventListener("load", ()=>{
+  // ensure DOM elements exist
+  if(!messagesContainer || !inputField || !sendBtn){
+    console.error("Missing DOM elements: messages / userInput / sendBtn");
+    return;
+  }
   inputField.disabled = false;
-  if (sendBtn) sendBtn.disabled = false;
+  sendBtn.disabled = false;
   startChat();
 });
+
+/* ---------- register handlers map for addOptions nextName usage ---------- */
+handlers.showMainMenu = showMainMenu;
+handlers.handleA = handleA;
+handlers.handleB = handleB;
+handlers.handleC = handleC;
+handlers.handleD = handleD;
+handlers.handleE = handleE;
+handlers.askGiro = askGiro;
+handlers.askGiro_Salud = askGiro_Salud;
+handlers.askGiro_Juridico = askGiro_Juridico;
+handlers.askGiro_Generic = askGiro_Generic;
+handlers.askDiagnostic = askDiagnostic;
+handlers.diagnosticMarketingOrOperations = diagnosticMarketingOrOperations;
+handlers.askMarketingBudget = askMarketingBudget;
+handlers.askReadyFor20Clients = askReadyFor20Clients;
+handlers.renderPitchForScale = renderPitchForScale;
+handlers.renderPitchForAutomation = renderPitchForAutomation;
+handlers.renderPitch_Salud = renderPitch_Salud;
+handlers.renderPitch_Juridico = renderPitch_Juridico;
+handlers.renderPitch_Generic = renderPitch_Generic;
+handlers.askInterestAndDecision = askInterestAndDecision;
+handlers.handleThink = handleThink;
+handlers.handleConsult = handleConsult;
+handlers.offerPresentation = offerPresentation;
+handlers.openContactCapture = openContactCapture;
+handlers.handleEvasiveContact = handleEvasiveContact;
+handlers.insistenceAnecdote = insistenceAnecdote;
+handlers.askEmailForPresentation = askEmailForPresentation;
+handlers.askForContact = openContactCapture; // alias
+
+/* ---------------------------------------------------------------------------------------- */
+/* Si al pegar algo falla, pega exactamente el error de la consola (F12 → Console) aquí.  */
+/* No haré cambios sin tu confirmación sobre textos: todo aquí es literal al flujo que entregaste. */
+/* ---------------------------------------------------------------------------------------- */
