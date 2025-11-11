@@ -1,274 +1,364 @@
-/* app/chat.js - Helios AI Labs
-   PART 1/2 - 5:32 pm 10/11/2025
-   - Mantiene todos los textos originales
-   - Incluye fixes: clearPendingTimeouts/clearLastOptions en handleA() y showMainMenu()
-   - safeShowMainMenu() centraliza reentradas
-   - Comentarios FIX 5:32 pm 10/11/2025 visibles
-*/
+// ===============================================================
+// Helios AI Labs Chatbot - Final Version (Part 1/2)
+// Includes guards for async safety, full logging, interpolation fixes
+// ===============================================================
 
-/* ---------- CONFIG ---------- */
-const WEBHOOK_URL = "https://heliosailabs369.app.n8n.cloud/webhook/chatbot-groq";
-const EMAIL_COPY_TO = "heliosailabs@gmail.com";
-const FORMS_OF_PAYMENT = "Transferencia bancaria, todas las tarjetas de crédito y débito VISA, Mastercard y American Express, Bitcoin y ETH.";
-const READ_PAUSE_MS = 3000;
-const FETCH_TIMEOUT_MS = 10000;
-const FETCH_RETRY = 1;
+document.addEventListener("DOMContentLoaded", () => {
+  console.info("[helios][info] Chatbot DOM fully loaded and initializing...");
 
-/* ---------- DOM ---------- */
-const messagesContainer = document.getElementById("messages");
-const inputField = document.getElementById("userInput");
-const sendBtn = document.getElementById("sendBtn");
-if (!messagesContainer || !inputField || !sendBtn) {
-  console.error("[helios][fatal] Missing DOM elements.");
-  throw new Error("Missing DOM elements");
-}
+  const READ_PAUSE_MS = 3000;
+  let conversationEnded = false;
+  let pendingTimeouts = [];
+  let currentStep = null;
+  const messagesContainer = document.getElementById("messages");
+  const userInput = document.getElementById("userInput");
+  const sendBtn = document.getElementById("sendBtn");
 
-/* ---------- Session & Lead ---------- */
-function genSessionId(){
-  let s = localStorage.getItem("helios_sessionId");
-  if(!s){ s = `sess_${Date.now()}_${Math.floor(Math.random()*10000)}`; localStorage.setItem("helios_sessionId",s);}
-  return s;
-}
-const sessionId = genSessionId();
-
-let lead = {
-  fullName:"", givenName:"", surname:"", title:"",
-  industry:"", subcategory:"", phone:"", email:"",
-  preferredDay:"", preferredTime:"", responses:[],
-  lastSentHash:null, lastSentAt:null, sent:false
-};
-
-let currentStep=null, optionsVisible=false, lastOptionsWrapper=null;
-let pendingTimeouts=[], conversationEnded=false;
-
-/* ---------- Timeout helpers ---------- */
-function addPendingTimeout(fn,ms){
-  const id=setTimeout(()=>{pendingTimeouts=pendingTimeouts.filter(t=>t!==id);try{fn();}catch(e){console.error(e);}},ms);
-  pendingTimeouts.push(id);return id;
-}
-function clearPendingTimeouts(){pendingTimeouts.forEach(clearTimeout);pendingTimeouts=[];}
-
-/* ---------- UI helpers ---------- */
-function addMessage(t,sender="bot"){
-  const el=document.createElement("div");
-  el.classList.add("message",sender);
-  el.innerHTML=t.replace(/\n/g,"<br/>");
-  messagesContainer.appendChild(el);
-  messagesContainer.scrollTop=messagesContainer.scrollHeight;
-}
-function clearLastOptions(){if(lastOptionsWrapper){lastOptionsWrapper.remove();lastOptionsWrapper=null;}optionsVisible=false;}
-function lockInput(ph="Selecciona una opción..."){optionsVisible=true;inputField.disabled=true;sendBtn.disabled=true;inputField.placeholder=ph;}
-function unlockInput(){optionsVisible=false;inputField.disabled=false;sendBtn.disabled=false;inputField.placeholder="Escribe aquí...";}
-function addOptions(items){
-  clearLastOptions();
-  const wrap=document.createElement("div");wrap.classList.add("message","bot");
-  const row=document.createElement("div");row.classList.add("option-row");
-  items.forEach(it=>{
-    const b=document.createElement("button");b.type="button";b.classList.add("option-btn");b.innerText=it.label;
-    b.onclick=()=>{addMessage(it.label,"user");clearLastOptions();if(typeof it.next==="function")it.next(it.value);};
-    row.appendChild(b);
-  });
-  wrap.appendChild(row);messagesContainer.appendChild(wrap);
-  lastOptionsWrapper=wrap;lockInput();
-}
-
-/* ---------- Flow helpers ---------- */
-function startChat(){
-  if(conversationEnded)return;
-  clearPendingTimeouts();
-  addMessage("¡Hola! Soy Helios, Asesor Comercial Senior de Helios AI Labs. ¿Con quién tengo el gusto?");
-  currentStep="captureName";unlockInput();
-}
-
-/* ---------- safeShowMainMenu (FIX 5:32 pm 10/11/2025) ---------- */
-function safeShowMainMenu(delay=500){
-  if(conversationEnded)return;
-  clearPendingTimeouts();clearLastOptions();
-  addPendingTimeout(()=>showMainMenu(),delay);
-}
-
-/* ---------- showMainMenu (FIX 5:32 pm 10/11/2025) ---------- */
-function showMainMenu(){
-  if(conversationEnded)return;
-  clearPendingTimeouts();clearLastOptions(); // FIX 5:32 pm 10/11/2025
-  addMessage("Gracias por contactarnos, somos Helios AI Labs. Para proporcionarle la mejor atención, personalizada y diseñar para usted un traje a la medida ¿Cuál de las siguientes preguntas desea que respondamos para usted?");
-  addPendingTimeout(()=>{
-    addOptions([
-      {label:"A) ¿Cómo funciona la automatización de procesos con IA y qué beneficios medibles puede aportar a mi negocio?",next:()=>handleA()},
-      {label:"B) Quiero información sobre su empresa...",next:()=>handleB()},
-      {label:"C) ¿Por qué adoptar Inteligencia Artificial hoy es tan importante y cuales son los escenarios para mi negocio sí decido esperar más tiempo?",next:()=>handleC()},
-      {label:"D) ¿Cuánto cuesta implementar IA en mi negocio y en cuanto tiempo recuperaré mi inversión? ¿Tienen promociones?",next:()=>handleD()},
-      {label:"E) Todas las anteriores",next:()=>handleE()}
-    ]);
-  },300);
-}
-
-/* ---------- handleA (FIX 5:32 pm 10/11/2025) ---------- */
-function handleA(suppress=false){
-  clearPendingTimeouts();clearLastOptions(); // FIX 5:32 pm 10/11/2025
-  addMessage("Para responder a su pregunta, con la atención que usted se merece, por favor dígame: ¿En cuál de los siguientes giros se encuentra su negocio?");
-  addPendingTimeout(()=>askGiro(),READ_PAUSE_MS);
-  if(!suppress)addPendingTimeout(()=>safeShowMainMenu(),READ_PAUSE_MS*4);
-}
-function handleB(suppress=false){
-  addMessage(`Nombre comercial: Helios AI Labs.
-Todos nuestros servicios de automatización con Inteligencia Artificial, desarrollo de Software y diseño de aplicaciones son facturados inmediatamente.
-Formas de pago: ${FORMS_OF_PAYMENT}.`);
-  if(!suppress)addPendingTimeout(()=>safeShowMainMenu(),READ_PAUSE_MS);
-}
-function handleC(suppress=false){
-  addMessage("Adoptar Inteligencia Artificial hoy es importante porque acelera procesos...");
-  if(!suppress)addPendingTimeout(()=>safeShowMainMenu(),READ_PAUSE_MS);
-}
-function handleD(suppress=false){
-  addMessage("Los costos de implementación varían según alcance...");
-  if(!suppress)addPendingTimeout(()=>safeShowMainMenu(),READ_PAUSE_MS);
-}
-function handleE(){
-  clearPendingTimeouts();lockInput("Leyendo, por favor espere...");
-  handleA(true);
-  addPendingTimeout(()=>handleB(true),READ_PAUSE_MS*2);
-  addPendingTimeout(()=>handleC(true),READ_PAUSE_MS*4);
-  addPendingTimeout(()=>handleD(true),READ_PAUSE_MS*6);
-  addPendingTimeout(()=>{unlockInput();openContactCapture();},READ_PAUSE_MS*8+300);
-}
-
-/* ---------- askGiro ---------- */
-function askGiro(){
-  addMessage("Para responder a su pregunta, con la atención que usted se merece, por favor dígame: ¿En cuál de los siguientes giros se encuentra su negocio?");
-  addPendingTimeout(()=>{
-    addOptions([
-      {label:"A) Salud",next:()=>askGiro_Salud()},
-      {label:"B) Despacho Jurídico",next:()=>askGiro_Juridico()},
-      {label:"C) Profesional independiente",next:()=>askGiro_Generic("Profesional independiente")}
-    ]);
-  },300);
-}
-
-/* ---------- PITCH ejemplo ---------- */
-function askGiro_Salud(){
-  addMessage("¿Cuál de las siguientes opciones describe mejor su negocio?");
-  addPendingTimeout(()=>{
-    addOptions([{label:"Consultorio propio",next:()=>renderPitch_Salud()}]);
-  },260);
-}
-function askGiro_Juridico(){addMessage("¿Cuál de las siguientes describe mejor su despacho jurídico?");}
-function askGiro_Generic(g){addMessage(`[TÍTULO] [APELLIDO], pronto mostraremos plan para ${g}`);}
-
-/* ---------- Contact ---------- */
-function openContactCapture(){
-  addMessage("Perfecto. Para agendar necesito: Teléfono (WhatsApp), Email, Día preferido y Hora aproximada.");
-  currentStep="captureContactLine";unlockInput();
-}
-
-/* ---------- Input listener ---------- */
-sendBtn.addEventListener("click",onSubmit);
-inputField.addEventListener("keydown",e=>{if(e.key==="Enter")onSubmit();});
-
-async function onSubmit(){
-  const raw=(inputField.value||"").trim();
-  if(!raw)return;
-  if(conversationEnded){addMessage("La sesión ha finalizado.");return;}
-  addMessage(raw,"user");
-  inputField.value="";
-  if(currentStep==="captureName"){
-    addMessage("¿Cómo prefiere que me dirija a usted? Elija una opción:");
-    addOptions([{label:"Dr.",next:()=>addMessage("Excelente Dr.")},{label:"Dra.",next:()=>addMessage("Excelente Dra.")}]);
-    currentStep=null;return;
-  }
-  if(currentStep==="captureContactLine"){addMessage("Gracias. En breve recibirá confirmación.");conversationEnded=true;return;}
-}
-
-/* ---------- End PART 1/2 - 5:32 pm 10/11/2025 ---------- */
-/* app/chat.js - Helios AI Labs
-   PART 2/2 - 5:32 pm 10/11/2025
-   - Incluye sendLeadPayload() con manejo de error
-   - Integración completa de logs y cierre seguro
-   - Flags: conversationEnded, lead.sent
-   - Comentarios FIX 5:32 pm 10/11/2025
-*/
-
-/* ---------- Validaciones ---------- */
-function isValidEmail(email){
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-/* ---------- Webhook ---------- */
-async function sendLeadPayload(extra={}){
-  if(!lead.email && !lead.phone){
-    console.warn("[helios][warn] Empty lead — nothing to send");
-    return false;
-  }
-
-  const payload={
-    sessionId,
-    timestamp:new Date().toISOString(),
-    lead,
-    extra:{ emailCopyTo:EMAIL_COPY_TO, formsOfPayment:FORMS_OF_PAYMENT, ...extra }
+  const lead = {
+    title: "",
+    given: "",
+    surname: "",
+    fullName: "",
+    email: "",
+    phone: "",
+    preferredDay: "",
+    preferredTime: "",
+    sent: false
   };
 
-  addMessage("Enviando información y preparando confirmación...","bot");
-  console.debug("[helios][debug] Payload:",payload);
+  // ===== Utility: timeout tracking =====
+  function addPendingTimeout(fn, delay) {
+    const t = setTimeout(fn, delay);
+    pendingTimeouts.push(t);
+    return t;
+  }
 
-  try{
-    const controller=new AbortController();
-    const timer=setTimeout(()=>controller.abort(),FETCH_TIMEOUT_MS);
-    const res=await fetch(WEBHOOK_URL,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(payload),
-      signal:controller.signal
+  function clearPendingTimeouts() {
+    console.debug("[helios][debug] Clearing all pending timeouts:", pendingTimeouts.length);
+    pendingTimeouts.forEach(clearTimeout);
+    pendingTimeouts = [];
+  }
+
+  // ===== Utility: DOM/UI helpers =====
+  function clearLastOptions() {
+    document.querySelectorAll(".options").forEach(opt => opt.remove());
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function interpolateLeadData(text) {
+    return text
+      .replace(/\[TÍTULO\]/g, lead.title || "Profesional")
+      .replace(/\[APELLIDO\]/g, lead.surname || "")
+      .replace(/\[NOMBRE\]/g, lead.given || lead.fullName || "Cliente");
+  }
+
+  function addMessage(text, sender = "bot") {
+    if (conversationEnded) return;
+    const message = document.createElement("div");
+    message.className = sender === "bot" ? "message bot" : "message user";
+    message.innerHTML = escapeHtml(interpolateLeadData(text));
+    messagesContainer.appendChild(message);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  function addMessageDelayed(text, delay = READ_PAUSE_MS) {
+    addPendingTimeout(() => addMessage(text, "bot"), delay);
+  }
+
+  function lockInput(placeholder) {
+    userInput.disabled = true;
+    sendBtn.disabled = true;
+    if (placeholder) userInput.placeholder = placeholder;
+  }
+
+  function unlockInput(placeholder) {
+    userInput.disabled = false;
+    sendBtn.disabled = false;
+    userInput.placeholder = placeholder || "Escribe aquí...";
+  }
+
+  // ===== Webhook POST =====
+  async function sendLeadPayload(extra = {}, endSession = false) {
+    const payload = { ...lead, ...extra, timestamp: new Date().toISOString() };
+    console.debug("[helios][debug] Preparing POST payload", payload);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    try {
+      const res = await fetch("https://heliosailabs369.app.n8n.cloud/webhook/chatbot-groq", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+
+      if (!res.ok) {
+        const body = await res.text();
+        console.error("[helios][error] Webhook returned error:", res.status, body);
+        addMessage("⚠️ Error al enviar la información. Intente de nuevo más tarde.", "bot");
+        if (endSession) conversationEnded = true;
+        return false;
+      }
+
+      console.info("[helios][info] Webhook POST successful:", res.status);
+      addMessage("✅ ¡Listo! Hemos enviado la información.", "bot");
+      if (endSession) {
+        conversationEnded = true;
+        addMessage("Gracias por contactarnos. En breve recibirá confirmación por email.", "bot");
+        return true;
+      } else {
+        addPendingTimeout(showMainMenu, 1000);
+      }
+    } catch (err) {
+      console.error("[helios][error] fetch() failed:", err);
+      addMessage("❌ Error de conexión con el servidor.", "bot");
+      if (endSession) conversationEnded = true;
+      return false;
+    }
+  }
+
+  // ===== Flow core =====
+  function startChat() {
+    if (conversationEnded) {
+      addMessage("La sesión ha finalizado. Por favor recargue para iniciar otra conversación.", "bot");
+      return;
+    }
+    addMessage("¡Hola! Soy Helios, Asesor Comercial Senior de Helios AI Labs. ¿Con quién tengo el gusto?");
+    currentStep = "captureName";
+    unlockInput();
+  }
+
+  function showMainMenu() {
+    if (conversationEnded) {
+      console.debug("[helios][info] showMainMenu() blocked — conversationEnded");
+      return;
+    }
+    clearPendingTimeouts();
+    clearLastOptions();
+    console.debug("[helios][debug] Displaying main menu");
+    addMessage("Gracias por contactarnos, somos Helios AI Labs. Para proporcionarle la mejor atención, personalizada y diseñar para usted un traje a la medida ¿Cuál de las siguientes preguntas desea que respondamos para usted?");
+    addPendingTimeout(() => {
+      addOptions([
+        "A) ¿Cómo funciona la automatización de procesos con IA y qué beneficios medibles puede aportar a mi negocio?",
+        "B) Quiero información sobre su empresa, ubicación, experiencia, credenciales, referencias, información fiscal, contrato, garantía por escrito, etc.",
+        "C) ¿Por qué adoptar Inteligencia Artificial hoy es tan importante y cuales son los escenarios para mi negocio sí decido esperar más tiempo?",
+        "D) ¿Cuánto cuesta implementar IA en mi negocio y en cuanto tiempo recuperaré mi inversión? ¿Tienen promociones?",
+        "E) Todas las anteriores"
+      ]);
+    }, READ_PAUSE_MS);
+  }
+
+  // ===== Input & options =====
+  function addOptions(options) {
+    const container = document.createElement("div");
+    container.className = "options";
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.textContent = opt;
+      btn.onclick = () => handleOption(opt);
+      container.appendChild(btn);
     });
-    clearTimeout(timer);
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    addMessage("✅ ¡Listo! Hemos enviado la información. En breve recibirá confirmación por email.","bot");
-    lead.sent=true;
-    lead.lastSentAt=Date.now();
-    lead.lastSentHash=btoa(JSON.stringify(lead)).slice(0,16);
-
-    console.info("[helios][info] Payload successfully sent:",lead.lastSentHash);
-    return true; // FIX 5:32 pm 10/11/2025
+    messagesContainer.appendChild(container);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
-  catch(err){
-    console.error("[helios][error] sendLeadPayload:",err);
-    addMessage("⚠️ No pudimos enviar la información al servidor. Por favor contacte vía WhatsApp: +52 771 762 2360","bot");
-    return false;
-  }
-}
 
-/* ---------- Reset Conversation ---------- */
-function resetConversation(){
-  clearPendingTimeouts();
-  clearLastOptions();
-  conversationEnded=false;
-  lead={ fullName:"",givenName:"",surname:"",title:"",industry:"",subcategory:"",phone:"",email:"",preferredDay:"",preferredTime:"",responses:[],sent:false };
+  async function handleOption(opt) {
+    if (conversationEnded) return;
+    addMessage(opt, "user");
+    if (opt.startsWith("A")) return handleA();
+    if (opt.startsWith("B")) return handleB();
+    if (opt.startsWith("C")) return handleC();
+    if (opt.startsWith("D")) return handleD();
+    if (opt.startsWith("E")) return handleE();
+  }
+
+  // ===============================================================
+  // END OF PART 1/2 — Next block continues with handleA–E, askGiro, 
+  // input handling, and conversation closing.
+  // ===============================================================
+// ===============================================================
+// Helios AI Labs Chatbot - Final Version (Part 2/2)
+// Includes guards for handleA–E, askGiro, and conversation handling
+// ===============================================================
+
+  // ===== Question Handlers =====
+
+  function handleA(suppress = false) {
+    clearPendingTimeouts();
+    clearLastOptions();
+    if (conversationEnded) return;
+
+    console.debug("[helios][debug] handleA() called", { suppress });
+    addMessage("Para responder a su pregunta, con la atención que usted se merece, por favor dígame: ¿En cuál de los siguientes giros se encuentra su negocio?");
+    addPendingTimeout(() => askGiro(), READ_PAUSE_MS);
+    if (!suppress) {
+      addPendingTimeout(() => showMainMenu(), READ_PAUSE_MS * 4);
+    }
+  }
+
+  function handleB(suppress = false) {
+    clearPendingTimeouts();
+    clearLastOptions();
+    if (conversationEnded) return;
+
+    console.debug("[helios][debug] handleB() called", { suppress });
+    addMessageDelayed("Nombre comercial: Helios AI Labs.", READ_PAUSE_MS);
+    addMessageDelayed("Todos nuestros servicios de automatización con Inteligencia Artificial, desarrollo de Software y diseño de aplicaciones son facturados inmediatamente.", READ_PAUSE_MS * 2);
+    addMessageDelayed("Ciudad / dirección:\n\nCorporativo Matriz: Río Lerma 232 piso 23 Col. Cuauhtémoc, Alcaldía Cuauhtémoc, CP 06500, CDMX.\nSucursal Pachuca: Av. Revolución 300 Col. Periodista, CP 42060, Pachuca de Soto, Hidalgo.", READ_PAUSE_MS * 3);
+    addMessageDelayed("Años de experiencia / trayectoria breve: 22 años de experiencia en el sector empresarial mexicano y estadounidense.", READ_PAUSE_MS * 4);
+    if (!suppress) addPendingTimeout(showMainMenu, READ_PAUSE_MS * 6);
+  }
+
+  function handleC(suppress = false) {
+    clearPendingTimeouts();
+    clearLastOptions();
+    if (conversationEnded) return;
+
+    console.debug("[helios][debug] handleC() called", { suppress });
+    addMessageDelayed("Adoptar Inteligencia Artificial hoy es importante porque acelera procesos, reduce errores y permite tomar decisiones basadas en datos.", READ_PAUSE_MS);
+    addMessageDelayed("Esperar implica perder ventaja competitiva, clientes potenciales y oportunidades de crecimiento, además de elevar el costo de implementación a futuro.", READ_PAUSE_MS * 2);
+    if (!suppress) addPendingTimeout(showMainMenu, READ_PAUSE_MS * 5);
+  }
+
+  function handleD(suppress = false) {
+    clearPendingTimeouts();
+    clearLastOptions();
+    if (conversationEnded) return;
+
+    console.debug("[helios][debug] handleD() called", { suppress });
+    addMessageDelayed("Los costos de implementación varían según el alcance del proyecto.", READ_PAUSE_MS);
+    addMessageDelayed("Contamos con paquetes y financiamiento; muchas implementaciones recuperan la inversión en menos de 3 meses dependiendo del caso.", READ_PAUSE_MS * 2);
+    if (!suppress) addPendingTimeout(showMainMenu, READ_PAUSE_MS * 4);
+  }
+
+  async function handleE() {
+    clearPendingTimeouts();
+    clearLastOptions();
+    if (conversationEnded) return;
+
+    console.debug("[helios][debug] handleE() called");
+    handleA(true);
+    handleB(true);
+    handleC(true);
+    handleD(true);
+    addPendingTimeout(() => {
+      addMessage("Perfecto, puedo mostrarle un plan de acción inmediato y agendar una asesoría gratuita de diagnóstico.");
+      addPendingTimeout(openContactCapture, READ_PAUSE_MS);
+    }, READ_PAUSE_MS * 8);
+  }
+
+  // ===== Ask Business Type =====
+  function askGiro() {
+    if (conversationEnded) return;
+    clearPendingTimeouts();
+    clearLastOptions();
+
+    console.debug("[helios][debug] askGiro() executed");
+    addMessage("Para responder a su pregunta, con la atención que usted se merece, por favor seleccione el giro que mejor describe su negocio:");
+
+    addPendingTimeout(() => {
+      addOptions([
+        "A) Salud",
+        "B) Jurídico",
+        "C) Educación",
+        "D) Comercio",
+        "E) Industria",
+        "F) Servicios",
+        "G) Otro"
+      ]);
+    }, READ_PAUSE_MS);
+  }
+
+  // ===== Open Contact Capture =====
+  function openContactCapture() {
+    if (conversationEnded) return;
+    clearPendingTimeouts();
+    clearLastOptions();
+
+    console.debug("[helios][debug] openContactCapture() initialized");
+    addMessage("Perfecto. Para agendar necesito: Teléfono (WhatsApp), Email, Día preferido y Hora aproximada.");
+    currentStep = "captureContact";
+    unlockInput("Ejemplo: +52 5551234567, contacto@empresa.com");
+  }
+
+  // ===== Input handling =====
+  async function onSubmit() {
+    if (conversationEnded) {
+      addMessage("La sesión ha finalizado. Por favor recargue la página para iniciar una nueva conversación.", "bot");
+      return;
+    }
+
+    const input = userInput.value.trim();
+    if (!input) return;
+    addMessage(input, "user");
+    userInput.value = "";
+
+    if (currentStep === "captureName") {
+      parseName(input);
+      addPendingTimeout(() => {
+        addMessage(`¿Cómo prefiere que me dirija a usted? Elija una opción:`);
+        addPendingTimeout(() => addOptions(["Lic.", "Dr.", "Dra.", "Ing.", "Mtro.", "Mtra.", "Otro"]), READ_PAUSE_MS);
+      }, READ_PAUSE_MS);
+      currentStep = "captureTitle";
+      return;
+    }
+
+    if (currentStep === "captureTitle") {
+      lead.title = input.replace(/\W+/g, "").trim();
+      addMessageDelayed(`Excelente ${lead.title} ${lead.surname}. Gracias.`, READ_PAUSE_MS);
+      addPendingTimeout(showMainMenu, READ_PAUSE_MS * 2);
+      currentStep = "mainMenu";
+      return;
+    }
+
+    if (currentStep === "captureContact") {
+      parseContact(input);
+      await sendLeadPayload({}, true);
+      return;
+    }
+  }
+
+  function parseName(raw) {
+    const text = raw.toLowerCase().replace(/^hola|buenas|soy|me llamo/gi, "").trim();
+    const parts = text.split(/\s+/);
+    const connectors = ["de", "del", "la", "las", "los"];
+    let surname = parts.pop() || "";
+    if (connectors.includes(parts[parts.length - 1])) surname = `${parts.pop()} ${surname}`;
+    const given = parts.join(" ");
+    lead.given = given.replace(/\b\w/g, c => c.toUpperCase());
+    lead.surname = surname.replace(/\b\w/g, c => c.toUpperCase());
+    lead.fullName = `${lead.given} ${lead.surname}`.trim();
+    console.debug("[helios][debug] Parsed name:", lead);
+  }
+
+  function parseContact(raw) {
+    const lower = raw.trim().toLowerCase();
+    const emailMatch = lower.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/);
+    if (emailMatch) lead.email = emailMatch[0];
+
+    const phoneMatch = lower.replace(lead.email || "", "").match(/\+?\d[\d\s-]{7,15}/);
+    if (phoneMatch) {
+      lead.phone = phoneMatch[0].replace(/[^\d+]/g, "");
+      if (lead.phone.length === 10 && !lead.phone.startsWith("+")) lead.phone = "+52" + lead.phone;
+    }
+
+    console.debug("[helios][debug] Parsed contact:", lead);
+  }
+
+  // ===== Event bindings =====
+  sendBtn.addEventListener("click", onSubmit);
+  userInput.addEventListener("keypress", e => { if (e.key === "Enter") onSubmit(); });
+
+  // ===== Start =====
+  console.info("[helios][info] Chatbot initialized and awaiting user input");
   startChat();
-}
-
-/* ---------- Botón nueva conversación ---------- */
-const resetBtn=document.createElement("button");
-resetBtn.textContent="Nueva conversación";
-resetBtn.id="resetBtn";
-resetBtn.style.position="fixed";
-resetBtn.style.bottom="15px";
-resetBtn.style.right="15px";
-resetBtn.style.zIndex="100";
-resetBtn.onclick=()=>{
-  if(confirm("¿Desea reiniciar la conversación?")){
-    addMessage("🔄 Reiniciando conversación...","bot");
-    addPendingTimeout(()=>resetConversation(),600);
-  }
-};
-document.body.appendChild(resetBtn);
-
-/* ---------- Logs de inicialización ---------- */
-console.info("[helios][info] Chatbot initialized and awaiting user input");
-console.debug("[helios][debug] Session ID:",sessionId);
-console.debug("[helios][debug] DOM:",{messagesContainer,inputField,sendBtn});
-console.debug("[helios][debug] Config:",{WEBHOOK_URL,EMAIL_COPY_TO,FORMS_OF_PAYMENT});
-
-/* ---------- Iniciar chat ---------- */
-startChat();
-
-/* ---------- End PART 2/2 - 5:32 pm 10/11/2025 ---------- */
+});
+// ===============================================================
+// END OF FILE chat.js (Part 2/2)
+// ===============================================================
