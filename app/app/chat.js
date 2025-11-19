@@ -376,7 +376,6 @@ function handleA(suppress = false){
   clearPendingTimeouts();
   clearLastOptions();
   console.debug("[helios][debug] handleA called", { suppress });
-  addMessage("Para responder a su pregunta, con la atención que usted se merece, por favor dígame: ¿En cuál de los siguientes giros se encuentra su negocio?");
   addPendingTimeout(()=> askGiro(), READ_PAUSE_MS);
   if (!suppress){
     addPendingTimeout(()=> showMainMenu(), READ_PAUSE_MS * 4);
@@ -528,382 +527,8 @@ function diagnosticMarketingOrOperations(choice){
         items.push({ label: "seguimiento", value:"seguimiento", next: ()=> askInterestAndDecision() });
       } else if(lead.industry === "Despacho Jurídico"){
         items.push({ label: "captación de casos", value:"captacion", next: ()=> askInterestAndDecision() });
-        items.push({ label: "documentación", value:"documentacion", next: ()=> askInterestAndDecision() });
-        items.push({ label: "filtros legales", value:"filtros", next: ()=> askInterestAndDecision() });
-      } else if(lead.industry === "Sector inmobiliario"){
-        items.push({ label: "leads", value:"leads", next: ()=> askInterestAndDecision() });
-        items.push({ label: "citas", value:"citas", next: ()=> askInterestAndDecision() });
-        items.push({ label: "tours", value:"tours", next: ()=> askInterestAndDecision() });
-        items.push({ label: "seguimiento", value:"seguimiento", next: ()=> askInterestAndDecision() });
-      } else if(lead.industry === "Comercio (minorista / mayorista)"){
-        items.push({ label: "inventarios", value:"inventarios", next: ()=> askInterestAndDecision() });
-        items.push({ label: "WhatsApp", value:"whatsapp", next: ()=> askInterestAndDecision() });
-        items.push({ label: "pedidos", value:"pedidos", next: ()=> askInterestAndDecision() });
-        items.push({ label: "Planificación de Recursos Empresariales", value:"planificacion", next: ()=> askInterestAndDecision() });
-      } else if(lead.industry === "Belleza"){
-        items.push({ label: "agenda", value:"agenda", next: ()=> askInterestAndDecision() });
-        items.push({ label: "promociones automáticas", value:"promos", next: ()=> askInterestAndDecision() });
-        items.push({ label: "reseñas", value:"reseñas", next: ()=> askInterestAndDecision() });
-      } else {
-        items.push({ label: "Automatizar tareas internas", value:"ops_generic", next: ()=> askInterestAndDecision() });
-      }
-      addOptions(items);
-    },300);
-  }
-}
-
-function askMarketingBudget(){
-  addMessage("¿Cuánto invierte aproximadamente al mes?");
-  addPendingTimeout(()=> {
-    addOptions([
-      { label: "A) Menos de $3,000 MXN", value:"<3000", next: ()=> askReadyFor20Clients() },
-      { label: "B) Entre $3,000 y $8,000 MXN", value:"3-8k", next: ()=> askReadyFor20Clients() },
-      { label: "C) Más de $8,000 MXN", value:">8k", next: ()=> askReadyFor20Clients() },
-      { label: "D) Mucho dinero y pocos resultados", value:"bad_spend", next: ()=> askReadyFor20Clients() }
-    ]);
-  },300);
-}
-
-function askReadyFor20Clients(){
-  addMessage("Si mañana le llegan 20 clientes nuevos… ¿Está listo para atenderlos?");
-  addPendingTimeout(()=> {
-    addOptions([
-      { label: "Sí", value:"ready_yes", next: ()=> renderPitchForScale() },
-      { label: "No", value:"ready_no", next: ()=> renderPitchForAutomation() } // "No" is in your flow
-    ]);
-  },300);
-}
-
-function renderPitchForScale(){ addMessage("Pitch agresivo (escala inmediata)"); addPendingTimeout(()=> askInterestAndDecision(), 600); }
-function renderPitchForAutomation(){ addMessage("Pitch enfocado en automatizar atención"); addPendingTimeout(()=> askInterestAndDecision(), 600); }
-
-/* ---------- PITCHES (literal texts preserved) ---------- */
-function renderPitch_Salud(subcat){
-  lead.subcategory = subcat || "";
-  const text = `En consultorios y clínicas la automatización con IA puede contestar llamadas por voz o mensajes de texto, agendar citas y confirmar consultas por usted 24/7, enviar recordatorios a los pacientes (disminuyendo dramáticamente las consultas canceladas o los retrasos). Puede notificarle a Ud. directamente en caso de emergencia. Llevar un control de todos sus expedientes, cobrar consultas por adelantado con medios digitales, darle seguimiento a sus pacientes, enviar felicitaciones en días festivos. Puede aumentar el número de pacientes exponencialmente, de acuerdo a sus instrucciones.
-Es importante entender que vivimos en la era de la transformación digital. Según la Curva de Adopción de Innovación de Rogers, las empresas y profesionales se dividen en cinco categorías: los Innovadores (2.5%) que adoptan tecnología primero, los Adoptadores Tempranos (13.5%) que lideran tendencias, la Mayoría Temprana (34%) que adopta cuando ven resultados comprobados, la Mayoría Tardía (34%) que se suma por presión competitiva, y los Rezagados (16%) que resisten el cambio hasta que es demasiado tarde. En el sector salud, quienes adoptan IA ahora se posicionan como líderes, mientras que esperar significa ceder pacientes y prestigio a la competencia que ya está automatizada.
-Además, la automatización con IA atrae a un perfil de clientes con un mayor poder adquisitivo y eleva sustancialmente el ticket promedio.`;
-  addMessage(text);
-  addPendingTimeout(()=> {
-    addMessage("Si la implementación fuera 100% accesible a su economía y garantizara recuperar su inversión en un máximo de 3 meses, ¿estaría listo(a) para decidir hoy?");
-    addPendingTimeout(()=> {
-      addOptions([
-        { label: "A) Sí — Listo(a) para contratar hoy", value:"yes_now", next: ()=> openContactCapture() },
-        { label: "B) Lo tengo que pensar", value:"think", next: ()=> handleThink() },
-        { label: "C) Lo tengo que consultar (socio/jefe/esposo/esposa)", value:"consult", next: ()=> handleConsult() }
-      ]);
-    },300);
-  }, READ_PAUSE_MS);
-}
-
-function renderPitch_Juridico(subcat){
-  lead.subcategory = subcat || "";
-  const text = `⚖ [TÍTULO] [APELLIDO], en su profesión la confianza, velocidad y resultados lo son todo.
-La automatización con IA puede contestar llamadas por voz o mensajes de texto, responder dudas y preguntas frecuentes a sus clientes 24/7, agendar citas, enviar recordatorios, confirmar reuniones de trabajo, etc.
-Con IA puede lograr:
-✅ Más casos sin invertir más tiempo
-✅ Filtro automático de prospectos con capacidad económica real
-✅ Respuestas legales 24/7 con seguimiento de clientes
-✅ Control total de expedientes y fechas críticas
-✅ Ventas consultivas con storytelling legal
-✅ Casos mejor pagados — honorarios más altos
-📌 Usted se enfoca en ganar…
-La IA se encarga de llenar su despacho.
-Es importante entender que vivimos en la era de la transformación digital. Según la Curva de Adopción de Innovación de Rogers, las empresas y profesionales se dividen en cinco categorías: los Innovadores (2.5%) que adoptan tecnología primero, los Adoptadores Tempranos (13.5%) que lideran tendencias, la Mayoría Temprana (34%) que adopta cuando ven resultados comprobados, la Mayoría Tardía (34%) que se suma por presión competitiva, y los Rezagados (16%) que resisten el cambio hasta que es demasiado tarde. En el sector jurídico, quienes adoptan IA ahora se posicionan como líderes, mientras que esperar significa ceder casos y prestigio a la competencia que ya está automatizada.
-Además, la automatización con IA atrae a un perfil de clientes con un mayor poder adquisitivo y eleva sustancialmente el ticket promedio.`;
-  addMessage(text);
-  addPendingTimeout(()=> {
-    addMessage("Si la implementación fuera 100% accesible a su economía y garantizara recuperar su inversión en un máximo de 3 meses, ¿estaría listo(a) para decidir hoy?");
-    addPendingTimeout(()=> {
-      addOptions([
-        { label: "A) Sí — Listo(a) para contratar hoy", value:"yes_now", next: ()=> openContactCapture() },
-        { label: "B) Lo tengo que pensar", value:"think", next: ()=> handleThink() },
-        { label: "C) Lo tengo que consultar (socio/jefe/esposo/esposa)", value:"consult", next: ()=> handleConsult() }
-      ]);
-    },300);
-  }, READ_PAUSE_MS);
-}
-
-/* Generic mapping for other industries (literal texts preserved) */
-function renderPitch_Generic(giro){
-  lead.subcategory = giro || "";
-  const map = {
-    "Sector inmobiliario": `🏡 [TÍTULO] [APELLIDO], hoy el 95% de las personas buscan propiedades en internet.
-La automatización con IA puede contestar llamadas por voz o mensajes de texto, responder dudas y preguntas frecuentes a sus clientes 24/7, agendar citas, enviar recordatorios, confirmar reuniones de trabajo, etc.
-Si escriben y nadie responde de inmediato…
-👉 Se van con otro agente
-Nuestra IA trabaja como su co-closer 24/7:
-✅ Responde al instante por WhatsApp & redes
-✅ Agenda visitas y videollamadas sola
-✅ Filtra clientes con presupuesto real
-✅ Envía recordatorios hasta confirmar
-✅ Da seguimiento post-visita
-Además, la IA también filtra las mejores propiedades para obtener exclusividad y que solamente aquellas propiedades que tengan todos los documentos en regla y estén listas para ser vendidas llegarán al agente / broker, etc. ahorrándole mucho tiempo dado que no perderá tiempo en propiedades irregulares o con status legal incierto.
-Resultado en agencias como la suya:
-→ 300% más clientes calificados
-→ 3X cierres en 90 días
-Es importante entender que vivimos en la era de la transformación digital. ...`,
-    "Restaurante o Cafetería": `🍽 [TÍTULO] [APELLIDO], en su negocio cada mensaje que llega por WhatsApp o redes es un cliente listo para comprar ahora.
-Nuestra IA trabaja como anfitriona 24/7:
-✅ Responde al instante
-✅ Gestiona pedidos
-✅ Agenda reservaciones
-✅ Recomienda platillos populares
-✅ Confirma asistencia con anticipación
-Resultado real en negocios como el suyo:
-→ 2X a 4X más ventas en menos de 90 días
-→ Menos mesas vacías, más ingresos diarios
-...`,
-    "Educación": `🎓 [TÍTULO] [APELLIDO], hoy los padres y alumnos toman decisiones en cuestión de minutos.
-Nuestra IA es su coordinadora de admisiones 24/7:
-✅ Responde al instante dudas sobre costos, horarios, requisitos (sin errores)
-✅ Agenda visitas y entrevistas sola
-✅ Da seguimiento hasta la inscripción
-✅ Recordatorios automáticos de pagos
-✅ Retiene alumnos para evitar deserción
-
-Resultado en instituciones como la suya:
-→ +30% a +200% más inscripciones
-→ Menos abandono
-→ Más ingresos recurrentes`,
-    "Comercio (minorista / mayorista)": `🛍 [TÍTULO] [APELLIDO], en comercio la venta ocurre en el mismo momento en que el cliente pregunta.
-Nuestra IA se convierte en su mejor vendedor 24/7:
-✅ Responde WhatsApp e Instagram al instante
-✅ Muestra catálogo y precios
-✅ Recomienda productos con mayor margen
-✅ Agrega al carrito y cobra sola
-✅ Verifica existencias en inventario
-✅ Envío o pickup automatizado
-
-Resultado real:
-→ 2X a 5X ventas en menos de 90 días`,
-    "Profesional independiente": `👔 [TÍTULO] [APELLIDO], cuando una persona trabaja por su cuenta… el tiempo es el recurso más valioso y cada hora que no factura… es dinero perdido.
-Nuestra IA se encarga de:
-✅ Responder a todos los interesados al instante
-✅ Filtrar clientes sin presupuesto
-✅ Agendar citas automáticamente
-✅ Cerrar prospectos mientras usted trabaja`,
-    "Creación de contenido": `📱 [TÍTULO] [APELLIDO], tu marca puede multiplicar ventas sin saturarte.
-La automatización con IA puede contestar llamadas por voz o mensajes de texto, responder dudas y preguntas frecuentes a sus clientes 24/7, agendar citas, enviar recordatorios, confirmar reuniones de trabajo, etc.
-La IA:
-✅ Responde y convierte seguidores en clientes
-✅ Crea contenido, guiones y copy optimizados
-✅ Automatiza ventas de cursos, citas y productos digitales`,
-    "Belleza": `💄 [TÍTULO] [APELLIDO], cuando alguien quiere un servicio de belleza la decisión la toma en ese mismo momento.
-Nuestra IA trabaja como su recepcionista perfecta 24/7:
-✅ Responde al instante
-✅ Agenda citas sola
-✅ Envía recordatorios
-✅ Reduce cancelaciones +80%
-✅ Da seguimiento hasta que el cliente confirma`
-  };
-  const txt = map[giro] || `Pronto le mostraremos un plan específico para su giro.`;
-  addMessage(txt);
-  addPendingTimeout(()=> {
-    addMessage("Si la implementación fuera 100% accesible a su economía y garantizara recuperar su inversión en un máximo de 3 meses, ¿estaría listo(a) para decidir hoy?");
-    addPendingTimeout(()=> {
-      addOptions([
-        { label: "A) Sí — Listo(a) para contratar hoy", value:"yes_now", next: ()=> openContactCapture() },
-        { label: "B) Lo tengo que pensar", value:"think", next: ()=> handleThink() },
-        { label: "C) Lo tengo que consultar (socio/jefe/esposo/esposa)", value:"consult", next: ()=> handleConsult() }
-      ]);
-    },300);
-  }, READ_PAUSE_MS);
-}
-
-/* ---------- CLOSURE / objections ---------- */
-function askInterestAndDecision(){
-  addMessage("Si la implementación fuera 100% accesible a su economía y garantizara recuperar su inversión en un máximo de 3 meses, ¿estaría listo(a) para decidir hoy?");
-  addPendingTimeout(()=> {
-    addOptions([
-      { label: "A) Sí — Listo(a) para contratar hoy", value:"yes_now", next: ()=> openContactCapture() },
-      { label: "B) Lo tengo que pensar", value:"think", next: ()=> handleThink() },
-      { label: "C) Lo tengo que consultar (socio/jefe/esposo/esposa)", value:"consult", next: ()=> handleConsult() }
-    ]);
-  },300);
-}
-
-function handleThink(){
-  addMessage("¿Qué porcentaje de la decisión de implementar una automatización de IA en su negocio depende de usted?");
-  addPendingTimeout(()=> {
-    addOptions([
-      { label: "A) Menos de 50%", value:"lt50", next: ()=> { addMessage("Entiendo."); askDecisionIfHalfOrMore(false); } },
-      { label: "B) 50%", value:"50", next: ()=> { addMessage("Perfecto."); askDecisionIfHalfOrMore(true); } },
-      { label: "C) Más de 50%", value:"gt50", next: ()=> { addMessage("Perfecto."); askDecisionIfHalfOrMore(true); } }
-    ]);
-  },300);
-}
-
-function askDecisionIfHalfOrMore(isHalfOrMore){
-  if(isHalfOrMore){
-    addMessage("Si el 50% de su decisión en realidad fuera un 100% ¿estaría decidido a adquirir en este momento?");
-    addPendingTimeout(()=> {
-      addOptions([
-        { label: "Sí", value:"final_yes", next: ()=> openContactCapture() },
-        { label: "No", value:"final_no", next: ()=> { addMessage("Entiendo. Le enviaremos una presentación."); offerPresentation(); } }
-      ]);
-    },300);
-  } else {
-    addMessage("[TÍTULO] [APELLIDO] usted es un profesional [DE LA SALUD / DEL DERECHO / etc.] que ha tomado decisiones toda su vida, cada decisión que ha tomado, ha determinado sus éxitos y adversidades, esta es simplemente una decisión más, si usted pudiera predecir con certeza matemática y con métricas de inteligencia predictiva el retorno de su inversión respaldado por un contrato por escrito y con la garantía de que en un máximo de 3 meses usted recuperará su inversión ¿estaría listo para tomar la decisión el día de hoy?");
-    addPendingTimeout(()=> {
-      addOptions([
-        { label: "Sí", value:"indeciso_yes", next: ()=> openContactCapture() },
-        { label: "No", value:"indeciso_no", next: ()=> { addMessage("Entiendo. Le enviaremos una presentación."); offerPresentation(); } }
-      ]);
-    },400);
-  }
-}
-
-function offerPresentation(){
-  addMessage("Perfecto. ¿Cuál email usamos para enviar la presentación?");
-  currentStep = "capturePresentationEmail";
-  unlockInput();
-}
-
-function handleConsult(){
-  addMessage("¿Desea que le enviemos una presentación por email o prefiere agendar una reunión con su decisor?");
-  addPendingTimeout(()=> {
-    addOptions([
-      { label: "A) Enviar presentación (email)", value:"send_pres", next: ()=> askEmailForPresentation() },
-      { label: "B) Agendar reunión con decisor", value:"agendar_decisor", next: ()=> openContactCapture() }
-    ]);
-  },300);
-}
-
-function askEmailForPresentation(){
-  addMessage("Ingrese por favor su email en el campo inferior y presione Enviar.");
-  currentStep = "capturePresentationEmail";
-  unlockInput();
-}
-
-/* ---------- Contact capture ---------- */
-function openContactCapture(){
-  addMessage("Perfecto. Para agendar necesito: Teléfono (WhatsApp), Email, Día preferido y Hora aproximada.");
-  currentStep = "captureContactLine";
-  unlockInput();
-}
-
-/* ---------- Evasive handling & insistence anecdote (literal) ---------- */
-function handleEvasiveContact(){
-  addMessage('Claro que sí [TÍTULO] [APELLIDO], le comparto nuestro WhatsApp directo donde uno de nuestros ingenieros expertos puede atenderle de manera personalizada en cualquier momento que usted lo requiera +527717622360');
-}
-
-function insistenceAnecdote(){
-  addMessage('Muy bien [TÍTULO] pero antes de despedirnos le voy a contar brevemente una anécdota, uno de nuestros clientes se preguntaba por qué razón habían negocios super exitosos, mientras que el suyo parecía estar estancado, a pesar de ello decidió no invertir en nuestros servicios, así que le hice una sugerencia, le dije que escribiera en un papel "HELIOS" y que lo guardara debajo de su almohada y que cada vez que sintiera que su negocio no tenía el éxito que merecía, sacara el papel y lo leyera. ¿Le gustaría agendar una asesoría gratuita de 20 minutos que puede transformar su negocio para siempre o prefiere escribir HELIOS en un papelito?');
-  addPendingTimeout(()=> {
-    addOptions([
-      { label: "Agendar asesoría gratuita de 20 minutos", value:"agendar_20", next: ()=> openContactCapture() },
-      { label: "Prefiero escribir HELIOS en un papelito", value:"papelito", next: ()=> { addMessage("Entendido. Si cambia de opinión, aquí estamos."); } }
-    ]);
-  },300);
-}
-
-/* ---------- Submit typed input handling ---------- */
-sendBtn.addEventListener("click", onSubmit);
-inputField.addEventListener("keydown", (e) => { if (e.key === "Enter") onSubmit(); });
-
-async function onSubmit(){
-  const raw = (inputField.value || "").trim();
-  if(!raw) return;
-
-  if (conversationEnded){
-    addMessage("La sesión ha finalizado. Por favor refresque la página para iniciar una nueva conversación.", "bot");
-    inputField.value = "";
-    return;
-  }
-
-  if(optionsVisible){
-    addMessage("Por favor seleccione una de las opciones mostradas arriba.", "bot");
-    inputField.value = "";
-    return;
-  }
-
-  // store typed user bubble
-  addMessage(raw, "user");
-  inputField.value = "";
-  lead.responses.push({ text: raw, ts: new Date().toISOString() });
-  console.debug("[helios][debug] onSubmit user input", raw.slice(0,120));
-
-  // typed steps
-  if (currentStep === "captureName"){
-    // robust parse and store both given and surname
-    const parsed = parseName(raw);
-    lead.fullName = parsed.full;
-    lead.givenName = parsed.given;
-    lead.surname = parsed.surname;
-    // ask explicit title choice
-    addMessage("¿Cómo prefiere que me dirija a usted? Elija una opción:");
-    const titleItems = TITLE_CHOICES.map(t => ({ label: t, value: t, next: (v) => {
-      lead.title = v;
-      // say greeting using chosen title and surname (if surname duplicates given, show only once)
-      const displaySurname = (lead.surname === lead.givenName) ? lead.surname : lead.surname;
-      addMessage(`Excelente ${lead.title} ${displaySurname}. Gracias.`);
-      // small pause then show main menu
-      addPendingTimeout(()=> showMainMenu(), 500);
-    }}));
-    addOptions(titleItems);
-    currentStep = null;
-    return;
-  }
-
-  if (currentStep === "capturePresentationEmail"){
-    const emailCandidate = raw.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailCandidate)){
-      addMessage("Por favor ingrese un correo electrónico válido.", "bot");
-      return;
-    }
-    lead.email = emailCandidate;
-    // send presentation request via webhook (implementation in part 2)
-    try {
-      await sendLeadPayload({ wantsPresentation: true, emailCaptured: true }, true); // endSession=true
-      addMessage("Perfecto — le enviaremos la presentación a ese correo. Gracias.");
-    } catch(e){
-      console.error("[helios][error] sendLeadPayload failed (presentation email):", e);
-      addMessage("⚠️ Hubo un problema enviando la presentación. Puede escribirnos por WhatsApp: +52 771 762 2360", "bot");
-    }
-    currentStep = null;
-    // after sending, do not immediately reopen menu if endSession set in sendLeadPayload (part 2 handles conversationEnded)
-    return;
-  }
-
-  if (currentStep === "captureContactLine"){
-    // flexible parse of contact line
-    const parsed = parseContactLine(raw);
-    if (!parsed.email && !parsed.phone){
-      addMessage("Por favor ingrese al menos Teléfono (WhatsApp) y Email separados por comas (o en texto libre).", "bot");
-      return;
-    }
-    if (!lead.phone && parsed.phone) lead.phone = parsed.phone;
-    if (!lead.email && parsed.email) lead.email = parsed.email;
-    if (parsed.preferredDay) lead.preferredDay = parsed.preferredDay;
-    if (parsed.preferredTime) lead.preferredTime = parsed.preferredTime;
-
-    addMessage("Gracias. En breve recibirá confirmación por email si procede.");
-    currentStep = null;
-
-    // schedule sending payload; sendLeadPayload implemented in Part 2
-    try {
-      await sendLeadPayload({ schedule: !!lead.email, emailCaptured: !!lead.email }, true); // endSession true => will close session
-    } catch(e){
-      console.error("[helios][error] sendLeadPayload failed (contact capture):", e);
-      addMessage("⚠️ No pudimos enviar la información al servidor. Por favor contacte vía WhatsApp: +52 771 762 2360", "bot");
-    }
-    return;
-  }
-
-  // fallback: reopen menu
-  addPendingTimeout(()=> {
-    addMessage("No entendí exactamente — ¿Desea ver las opciones nuevamente?");
-    addPendingTimeout(()=> showMainMenu(), 400);
-  }, 200);
-}
-
-/* ---------- End of PART 1/2 ----------
-   -> PART 2/2 will include:
-      - sendLeadPayload implementation (POST with AbortController, retry, verbose logs, lastSentHash logic, endSession handling)
-      - functions to reset conversation, restart, init call (startChat())
-      - any remaining glue code
-*//* ---------- sendLeadPayload() ---------- */
+        items.push({ label:
+          /* ---------- sendLeadPayload() - Con alternativas gratuitas ---------- */
 async function sendLeadPayload(extra = {}, endSession = false) {
   if (conversationEnded) {
     console.debug("[helios][info] sendLeadPayload aborted: conversationEnded");
@@ -923,72 +548,242 @@ async function sendLeadPayload(extra = {}, endSession = false) {
     return false;
   }
 
-  // AbortController for timeout
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  // ====== OPCIÓN 1: TELEGRAM BOT (RECOMENDADO - 100% GRATIS) ======
+  // 1. Crea un bot en Telegram con @BotFather
+  // 2. Obtén el token del bot
+  // 3. Obtén tu Chat ID (envía mensaje al bot y ve https://api.telegram.org/bot<TOKEN>/getUpdates)
+  // 4. Descomenta y configura:
+  
+  /*
+  const TELEGRAM_BOT_TOKEN = "TU_BOT_TOKEN_AQUI";
+  const TELEGRAM_CHAT_ID = "TU_CHAT_ID_AQUI";
+  
+  const telegramMessage = `
+🆕 NUEVO LEAD - Helios AI Labs
+━━━━━━━━━━━━━━━━━━━━
+👤 Nombre: ${lead.fullName || 'N/A'}
+📧 Email: ${lead.email || 'N/A'}
+📱 Teléfono: ${lead.phone || 'N/A'}
+🏢 Industria: ${lead.industry || 'N/A'}
+📊 Subcategoría: ${lead.subcategory || 'N/A'}
+📅 Día preferido: ${lead.preferredDay || 'N/A'}
+⏰ Hora preferida: ${lead.preferredTime || 'N/A'}
+🎯 Nivel de interés: ${lead.interestLevel || 'N/A'}
+💰 Presupuesto marketing: ${lead.marketingBudget || 'N/A'}
+━━━━━━━━━━━━━━━━━━━━
+🆔 Session: ${sessionId}
+⏱️ ${new Date().toLocaleString('es-MX')}
+  `.trim();
 
-  let attempt = 0;
-  let success = false;
-  let responseStatus = null;
-  let responseText = null;
-
-  while (attempt <= FETCH_RETRY && !success) {
-    try {
-      console.debug(`[helios][debug] Sending payload attempt ${attempt + 1}/${FETCH_RETRY + 1}`, payload);
-      const res = await fetch(WEBHOOK_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload),
-        signal: controller.signal
-      });
-      responseStatus = res.status;
-      try {
-        responseText = await res.text();
-      } catch (_) {
-        responseText = "[no body]";
-      }
-
-      console.debug("[helios][debug] Webhook response:", responseStatus, responseText);
-
-      if (res.ok) {
-        success = true;
-        lead.lastSentHash = currentHash;
-        lead.lastSentAt = Date.now();
-        console.info("[helios][info] Payload successfully sent", { status: responseStatus });
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: telegramMessage,
+        parse_mode: "HTML"
+      })
+    });
+    
+    if (res.ok) {
+      lead.lastSentHash = currentHash;
+      lead.lastSentAt = Date.now();
+      console.info("[helios][info] Lead sent successfully via Telegram");
+      addMessage("✅ ¡Listo! Hemos enviado la información correctamente.", "bot");
+      if (endSession) {
+        conversationEnded = true;
+        addMessage("Gracias por contactarnos. En breve recibirá confirmación por email.", "bot");
       } else {
-        console.warn("[helios][warn] Non-OK HTTP response", { status: responseStatus });
+        addPendingTimeout(() => showMainMenu(), 1000);
       }
-    } catch (err) {
-      console.error(`[helios][error] fetch error on attempt ${attempt + 1}:`, err);
-      if (err.name === "AbortError") {
-        console.error("[helios][error] Fetch aborted due to timeout", { timeout: FETCH_TIMEOUT_MS });
+      return true;
+    }
+  } catch(e) {
+    console.error("[helios][error] Telegram send failed:", e);
+  }
+  */
+
+  // ====== OPCIÓN 2: DISCORD WEBHOOK (100% GRATIS) ======
+  // 1. Crea un servidor de Discord
+  // 2. Ve a Server Settings > Integrations > Webhooks > New Webhook
+  // 3. Copia la Webhook URL
+  // 4. Descomenta y configura:
+  
+  /*
+  const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/TU_WEBHOOK_URL";
+  
+  const discordEmbed = {
+    embeds: [{
+      title: "🆕 Nuevo Lead - Helios AI Labs",
+      color: 0x00ff00,
+      fields: [
+        { name: "👤 Nombre", value: lead.fullName || 'N/A', inline: true },
+        { name: "📧 Email", value: lead.email || 'N/A', inline: true },
+        { name: "📱 Teléfono", value: lead.phone || 'N/A', inline: true },
+        { name: "🏢 Industria", value: lead.industry || 'N/A', inline: true },
+        { name: "📊 Subcategoría", value: lead.subcategory || 'N/A', inline: true },
+        { name: "📅 Día", value: lead.preferredDay || 'N/A', inline: true },
+        { name: "⏰ Hora", value: lead.preferredTime || 'N/A', inline: true },
+        { name: "💰 Presupuesto", value: lead.marketingBudget || 'N/A', inline: true }
+      ],
+      footer: { text: `Session: ${sessionId}` },
+      timestamp: new Date().toISOString()
+    }]
+  };
+
+  try {
+    const res = await fetch(DISCORD_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(discordEmbed)
+    });
+    
+    if (res.ok) {
+      lead.lastSentHash = currentHash;
+      lead.lastSentAt = Date.now();
+      console.info("[helios][info] Lead sent successfully via Discord");
+      addMessage("✅ ¡Listo! Hemos enviado la información correctamente.", "bot");
+      if (endSession) {
+        conversationEnded = true;
+        addMessage("Gracias por contactarnos. En breve recibirá confirmación por email.", "bot");
+      } else {
+        addPendingTimeout(() => showMainMenu(), 1000);
       }
+      return true;
     }
-    attempt++;
-    if (!success && attempt <= FETCH_RETRY) {
-      await new Promise(r => setTimeout(r, 1200)); // simple retry delay
+  } catch(e) {
+    console.error("[helios][error] Discord send failed:", e);
+  }
+  */
+
+  // ====== OPCIÓN 3: GOOGLE SHEETS (GRATIS - REQUIERE GOOGLE APPS SCRIPT) ======
+  // 1. Crea una Google Sheet
+  // 2. Ve a Extensions > Apps Script
+  // 3. Pega este código:
+  /*
+    function doPost(e) {
+      const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+      const data = JSON.parse(e.postData.contents);
+      
+      sheet.appendRow([
+        new Date(),
+        data.sessionId,
+        data.fullName,
+        data.email,
+        data.phone,
+        data.industry,
+        data.subcategory,
+        data.preferredDay,
+        data.preferredTime,
+        data.marketingBudget,
+        JSON.stringify(data.responses)
+      ]);
+      
+      return ContentService.createTextOutput(JSON.stringify({success: true}))
+        .setMimeType(ContentService.MimeType.JSON);
     }
+  */
+  // 4. Deploy as Web App > Anyone can access
+  // 5. Copia la URL y descomenta:
+  
+  /*
+  const GOOGLE_SCRIPT_URL = "TU_GOOGLE_APPS_SCRIPT_URL";
+  
+  try {
+    const res = await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    
+    if (res.ok) {
+      lead.lastSentHash = currentHash;
+      lead.lastSentAt = Date.now();
+      console.info("[helios][info] Lead sent successfully to Google Sheets");
+      addMessage("✅ ¡Listo! Hemos enviado la información correctamente.", "bot");
+      if (endSession) {
+        conversationEnded = true;
+        addMessage("Gracias por contactarnos. En breve recibirá confirmación por email.", "bot");
+      } else {
+        addPendingTimeout(() => showMainMenu(), 1000);
+      }
+      return true;
+    }
+  } catch(e) {
+    console.error("[helios][error] Google Sheets send failed:", e);
+  }
+  */
+
+  // ====== OPCIÓN 4: EMAIL DIRECTO VIA FORMSPREE (GRATIS - 50 envíos/mes) ======
+  // 1. Ve a https://formspree.io
+  // 2. Crea una cuenta gratuita
+  // 3. Crea un nuevo form y obtén el endpoint
+  // 4. Descomenta:
+  
+  /*
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/TU_FORM_ID";
+  
+  try {
+    const res = await fetch(FORMSPREE_ENDPOINT, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        email: EMAIL_COPY_TO,
+        subject: `Nuevo Lead: ${lead.fullName}`,
+        message: `
+          NUEVO LEAD - Helios AI Labs
+          =============================
+          Nombre: ${lead.fullName}
+          Email: ${lead.email}
+          Teléfono: ${lead.phone}
+          Industria: ${lead.industry}
+          Subcategoría: ${lead.subcategory}
+          Día preferido: ${lead.preferredDay}
+          Hora preferida: ${lead.preferredTime}
+          
+          Session ID: ${sessionId}
+          Timestamp: ${new Date().toLocaleString('es-MX')}
+        `
+      })
+    });
+    
+    if (res.ok) {
+      lead.lastSentHash = currentHash;
+      lead.lastSentAt = Date.now();
+      console.info("[helios][info] Lead sent successfully via Formspree");
+      addMessage("✅ ¡Listo! Hemos enviado la información correctamente.", "bot");
+      if (endSession) {
+        conversationEnded = true;
+        addMessage("Gracias por contactarnos. En breve recibirá confirmación por email.", "bot");
+      } else {
+        addPendingTimeout(() => showMainMenu(), 1000);
+      }
+      return true;
+    }
+  } catch(e) {
+    console.error("[helios][error] Formspree send failed:", e);
+  }
+  */
+
+  // ====== FALLBACK: Si todas las opciones fallan o están deshabilitadas ======
+  // Guarda en localStorage como backup y muestra mensaje al usuario
+  try {
+    const leadsBackup = JSON.parse(localStorage.getItem("helios_leads_backup") || "[]");
+    leadsBackup.push(payload);
+    localStorage.setItem("helios_leads_backup", JSON.stringify(leadsBackup));
+    console.warn("[helios][warn] Lead saved to localStorage backup");
+  } catch(e) {
+    console.error("[helios][error] Failed to save to localStorage:", e);
   }
 
-  clearTimeout(timeoutId);
-
-  if (success) {
-    addMessage("✅ ¡Listo! Hemos enviado la información correctamente.", "bot");
-    if (endSession) {
-      conversationEnded = true;
-      addMessage("Gracias por contactarnos. En breve recibirá confirmación por email.", "bot");
-    } else {
-      addPendingTimeout(() => showMainMenu(), 1000);
-    }
-    return true;
-  } else {
-    addMessage("⚠️ No se pudo enviar la información al servidor. Intente más tarde o contacte soporte.", "bot");
-    if (endSession) conversationEnded = true;
-    console.error("[helios][error] sendLeadPayload failed after retries", { responseStatus, responseText });
-    return false;
-  }
+  addMessage("⚠️ Sistema de notificaciones temporalmente no disponible. Sus datos se han guardado localmente. Por favor contacte por WhatsApp: +52 771 762 2360", "bot");
+  if (endSession) conversationEnded = true;
+  
+  return false;
 }
 
 /* ---------- Reset conversation ---------- */
@@ -1035,18 +830,52 @@ function injectRestartButton() {
   btn.style.padding = "6px 10px";
   btn.style.fontSize = "14px";
   btn.style.zIndex = "9999";
+  btn.style.cursor = "pointer";
   btn.addEventListener("click", resetConversation);
   document.body.appendChild(btn);
 }
+
+/* ---------- Helper: Ver leads guardados en localStorage ---------- */
+function showBackupLeads() {
+  try {
+    const backup = localStorage.getItem("helios_leads_backup");
+    if (backup) {
+      const leads = JSON.parse(backup);
+      console.table(leads);
+      console.info(`[helios][info] ${leads.length} leads en backup. Usa clearBackupLeads() para limpiar.`);
+      return leads;
+    } else {
+      console.info("[helios][info] No hay leads en backup.");
+      return [];
+    }
+  } catch(e) {
+    console.error("[helios][error] Error reading backup:", e);
+    return [];
+  }
+}
+
+function clearBackupLeads() {
+  localStorage.removeItem("helios_leads_backup");
+  console.info("[helios][info] Backup de leads limpiado.");
+}
+
+// Exponer funciones globales para debugging
+window.helios = {
+  showBackupLeads,
+  clearBackupLeads,
+  resetConversation,
+  lead: () => lead
+};
 
 /* ---------- Init on DOM ready ---------- */
 document.addEventListener("DOMContentLoaded", () => {
   if (!window.__helios_initialized) {
     window.__helios_initialized = true;
     console.info("[helios][init] DOM ready, initializing chatbot...");
+    console.info("[helios][init] Funciones disponibles en consola: window.helios.showBackupLeads(), window.helios.clearBackupLeads()");
     injectRestartButton();
     startChat();
   }
 });
 
-/* ---------- End of PART 2/2 ---------- */
+/* ---------- End of PART 2/2 ---------- */ 
